@@ -1,0 +1,23 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>swapping</title>
+        <script>
+            function func1(){
+                var first=document.getElementById("a").value;
+                var second=document.getElementById("b").value;
+                var temp=first;
+                first=second;
+                second=temp;
+                alert("After Swapping: A = " + first + " and B = " + second);
+            }
+        </script>
+    </head>
+<body>
+    <h1>Swapping of Two Numbers</h1>
+    Enter A:<input id="a"><br>
+    Enter B:<input id="b">
+    <button onclick="func1()">Swap Numbers</button>
+    
+</body>
+</html>

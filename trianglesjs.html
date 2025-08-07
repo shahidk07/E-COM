@@ -1,0 +1,21 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>Area</title>
+    </head>
+    <body>
+         <h1>AREA OF TRIANGLE</h1>
+         Enter the height of triangle:<input id="height"/><br>
+         Enter the base of trianle:<input id="base"/>
+        
+         <button onclick="func2()">Calculate</button>
+         <script type="text/javascript">
+            function func2(){
+             var h=document.getElementById("height").value;
+             var b=document.getElementById("base").value;
+             var area = 1/2 * parseFloat(b) * parseFloat(h);
+             document.write(area); }
+
+         </script>
+    </body>
+</html>

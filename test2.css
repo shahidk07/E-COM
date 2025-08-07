@@ -1,0 +1,65 @@
+*{
+    margin: 0px;
+    padding: 0px;
+}
+.heading{
+    background-color: dodgerblue;
+    height:100px;
+    width:100%;
+    text-align: center;
+}
+.heading h1{
+    padding:20px;
+    display: inline-block;
+    color:tomato;
+}
+.main{
+    background-color: lightgray;
+    padding:5px
+}
+#menubtn{
+    position: absolute;
+    left:5px;
+    padding-top:20px;
+    margin-right: 10px;
+    size: 200;
+    font-size:200%
+}
+.sidebar{
+    background-color:gold;
+    height:100vh;
+    width:0px;
+    position:fixed;
+    top:0px;
+    overflow: hidden;
+    border-radius: 5px;
+    
+
+}
+#closebtn{
+    left:10px;
+    top:10px;
+    font-size: 200%;
+    position:relative;
+}
+ #menubtn:hover {
+    cursor:grab;
+ }
+ #closebtn:hover{
+    cursor:grab;
+ }
+ #logout{
+    position:absolute;
+    bottom:10px;
+ }
+.menuitems{
+    margin:10px;
+    margin-top: 20px;
+    font-size:150%;
+}
+.menuitems li {
+    height:40px;
+}
+.opensidebar{
+    width:200px;
+}

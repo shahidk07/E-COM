@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cart Page</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+    .cart-container {
+      margin: 50px auto;
+      width: 80%;
+    }
+    .cart-header {
+      display: flex;
+      justify-content: space-between;
+      background-color: #28a745;
+      padding: 10px;
+      color: white;
+      border-radius: 8px;
+    }
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 15px;
+      border-bottom: 1px solid #ddd;
+      background-color: white;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+    .cart-item p {
+      margin: 0;
+    }
+    .cart-footer {
+      display: flex;
+      justify-content: space-between;
+      background-color: white;
+      padding: 15px;
+      border-radius: 8px;
+    }
+    .cart-footer button {
+      padding: 10px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .cart-footer button:hover {
+      background-color: #218838;
+    }
+  </style>
+</head>
+<body>
+  <div class="cart-container">
+    <div class="cart-header">
+      <h2>Your Cart</h2>
+      <button onclick="clearCart()">Clear Cart</button>
+    </div>
+    <div id="cartItems"></div>
+    <div class="cart-footer">
+      <p>Total: $<span id="totalPrice">0</span></p>
+      <button onclick="checkout()">Checkout</button>
+    </div>
+  </div>
+
+  <script>
+    function loadCart() {
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
+      let cartItemsDiv = document.getElementById('cartItems');
+      let totalPrice = 0;
+
+      cartItemsDiv.innerHTML = '';
+
+      cart.forEach(item => {
+        let cartItemDiv = document.createElement('div');
+        cartItemDiv.classList.add('cart-item');
+        cartItemDiv.innerHTML = `
+          <p>${item.name}</p>
+          <p>$${item.price}</p>
+        `;
+        cartItemsDiv.appendChild(cartItemDiv);
+        totalPrice += item.price;
+      });
+
+      document.getElementById('totalPrice').innerText = totalPrice;
+    }
+
+    function clearCart() {
+      localStorage.removeItem('cart');
+      loadCart();
+    }
+
+    function checkout() {
+      alert('Proceeding to checkout...');
+    }
+
+    window.onload = loadCart;
+  </script>
+</body>
+</html>

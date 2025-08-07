@@ -1,0 +1,14 @@
+[
+    {
+      "id":1,
+      "name":"Laptop ",
+      "price":56000 ,
+      "image":""
+    },
+    {
+        "id":2,
+        "name":"Desktop Fan",
+        "price": 2499,
+        "image":""
+      }
+]

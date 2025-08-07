@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Responsive Layout</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // Toggle sidebar visibility on small screens
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('hidden');
+    }
+  </script>
+</head>
+<body class="bg-gray-100">
+
+  <!-- Top Search Bar -->
+  <div class="bg-white shadow p-3 flex justify-between items-center">
+    <input
+      type="text"
+      placeholder="Search..."
+      class="w-full sm:w-3/4 p-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
+    />
+    <!-- Hamburger Button -->
+    <button class="sm:hidden ml-4 p-2" onclick="toggleSidebar()">
+      <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" stroke-width="2"
+           viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 6h16M4 12h16M4 18h16"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Header with Brand Name -->
+  <header class="bg-blue-600 text-white text-center py-4 text-2xl font-bold">
+    <h1>SHAHID STORE</h1>
+  </header>
+
+  <div class="flex">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="bg-white shadow w-64 p-4 h-screen fixed top-0 left-0 z-30 hidden sm:block sm:relative sm:top-auto sm:left-auto sm:z-auto">
+      <nav class="space-y-4 mt-20 sm:mt-0">
+        <a href="#" class="block text-blue-600 hover:underline">Home</a>
+        <a href="#" class="block text-blue-600 hover:underline">About</a>
+        <a href="#" class="block text-blue-600 hover:underline">Services</a>
+        <a href="#" class="block text-blue-600 hover:underline">Contact</a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6 ml-0 sm:ml-64 mt-20 sm:mt-0">
+      <h1 class="text-xl font-semibold mb-4">Welcome to My Website</h1>
+      <p>This is the main content area. Add your content here.</p>
+    </main>
+  </div>
+
+</body>
+</html>

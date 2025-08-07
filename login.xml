@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="login.xsl"?>
+<loginPage>
+    <form>
+        <title>LOGIN</title>
+        <fields>
+            <field>
+                <type>text</type>
+                <placeholder>Email</placeholder>
+            </field>
+            <field>
+                <type>password</type>
+                <placeholder>Password</placeholder>
+            </field>
+        </fields>
+        <options>
+            <checkbox>Remember me</checkbox>
+            <link>Forgot Password?</link>
+        </options>
+        <button>Login</button>
+        <register>
+            <message>Don't have an account?</message>
+            <link>signup.html</link>
+        </register>
+    </form>
+</loginPage>
