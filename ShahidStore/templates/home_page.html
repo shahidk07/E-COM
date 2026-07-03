@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+  <style>
+html{
+  height: 100%;
+}
+body{
+ min-height: 100%;
+ display: flex;
+ flex-direction: column;
+}
+    header {
+      width:100%;
+      background: linear-gradient(45deg, #ff00ff, #00ffff, #ff00ff);
+      color: #fff;
+      padding: 19px;
+      text-align: center;
+      margin-top: 10px;
+      margin-left: 0px;
+      margin-right: 0px;
+    }
+
+    .search {
+      width: max-content;
+      display: flex;
+      justify-content: center;
+      padding: 10px;
+      height: 10px;
+      width: 700px;
+      align-items: center;
+      border-radius: 28px;
+      background: #f6f6f6;
+    }
+
+    .search-input {
+      color: gray;
+      border: none;
+      background: transparent;
+      Width: 900px
+    }
+
+    nav ul {
+      display: flex;
+      justify-content: center;
+    }
+
+    form {
+      justify-content: center;
+      display: flex;
+      align-items: center;
+    }
+
+    nav li {
+      color: white;
+      margin: 15px;
+    }
+
+    main img {
+      z-index: -1;
+      position: absolute;
+    }
+
+    nav a {
+      color: white;
+    }
+
+ footer {
+  height: 170px;
+  margin: 0;
+  background: linear-gradient(45deg, #ff00ff, #00ffff, #ff00ff);
+  color: #fff;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-start;
+}
+
+.about,
+.links,
+.other {
+  width: 400px;
+  height: 100%;
+}
+
+    .about {
+      left: 0px;
+      margin-right: 150px;
+    }
+
+    .links {
+      left: 1200px;
+      margin-right: 140px;
+    }
+
+    .other {
+      left: 650px;
+    }
+
+    nav a:hover {
+      font-size: 20px;
+      color: rgb(28, 9, 38);
+      ;
+    }
+
+    nav a:focus {
+      border-color: rgb(7, 202, 72);
+      background-color: #c3c3ce;
+      box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+    }
+
+    .categories {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      margin-left: 10px;
+      gap:50px;
+
+
+    }
+
+    .cat_element {
+      height: 300px;
+      width: 350px;
+      flex-wrap: wrap;
+      flex: 1 1 calc(33.333% - 40px);
+      border: 1px solid black;
+      background: #fff;
+      border-radius: 5px;
+      box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .cat_element:hover {
+      transform: scale(1.02)
+    }
+
+    .slider {
+      width: 350px;
+      height: 225px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .slider figure {
+      position: absolute;
+      width: 500%;
+      margin: 0;
+      left: 0;
+      display: flex;
+      animation: slider 13s infinite;
+    }
+
+    .slider figure img {
+      width: 20%;
+      object-fit: cover;
+      position: relative;
+    }
+
+    @keyframes slider {
+      0% {
+        left: 0;
+      }
+
+      20% {
+        left: 0;
+      }
+
+      40% {
+        left: -100%;
+      }
+
+      60% {
+        left: -200%;
+      }
+
+      80% {
+        left: -300%;
+      }
+
+      100% {
+        left: 0;
+      }
+    }
+    @media(max-width:580px)
+    {
+    .categories{flex-direction:column;
+    gap:50px;}
+    }
+  </style>
+
+</head>
+
+<body>
+
+  <form>
+
+    <div class="search">
+      <span class="search-icon material-symbols-outlined">
+        search
+      </span>
+
+      <input type="search" class="search-input" placeholder="Search Products.....">
+
+    </div>
+
+  </form>
+  <header>
+    <h1>SHAHID STORE</h1>
+    <NAV>
+      <ul>
+        <li><a href="homepage.html">HOME</a></li>
+        <li><a href="productspage.html">SHOP NOW</a></li>
+        <LI><a href=" ">CART</a></LI>
+        <LI><a href="">CONTACT US</a></LI>
+        <LI><a href="aboutus.html"> ABOUT US</a></LI>
+        <LI><a href="signup.html">SIGN UP</a></LI>
+        <LI><a href="loginpage.html"> SIGN IN</a></LI>
+      </ul>
+    </NAV>
+  </header>
+
+  <h1 style="text-align: center;">Shop By Categories</h1>
+  <div class="categories">
+
+    <a href="productspage.html" style="color:black;text-decoration: none;">
+      <div class="cat_element">
+        <div class="slider">
+          <figure>
+            <img src="images\electronics.jpg">
+            <img src="images\lp1.png">
+            <img src="images\accessories.webp">
+            <img src="images\electronics.jpg">
+          </figure>
+        </div>
+        <h3 style="text-align: center;">Laptops and Accessories</h3>
+      </div>
+    </a>
+
+    <a href="productspage.html" style="color:black;text-decoration: none;">
+      <div class="cat_element">
+        <div class="slider">
+          <figure>
+            <img src="images\fitness1.jpeg">
+            <img src="images\fitness3.jpeg">
+            <img src="images\fitness4.png">
+            <img src="images\fitness1.jpeg">
+          </figure>
+        </div>
+        <h3 style="text-align: center;">Health and Fitness</h3>
+      </div>
+    </a>
+
+    <a href="productspage.html" style="color:black;text-decoration: none;">
+      <div class="cat_element">
+        <div class="slider">
+          <figure>
+            <img src="images\decoration.jpg">
+            <img src="images\decoration2.jpeg">
+            <img src="images\decoration3.jpeg">
+            <img src="images\decoration.jpg">
+          </figure>
+        </div>
+        <h3 style="text-align: center;">Decorations</h3>
+      </div>
+    </a>
+  <a href="productspage.html" style="color:black;text-decoration: none;">
+    <div class="cat_element">
+      <div class="slider">
+        <figure>
+          <img src="images\fitness1.jpeg">
+          <img src="images\fitness3.jpeg">
+          <img src="images\fitness4.png">
+          <img src="images\fitness1.jpeg">
+        </figure>
+      </div>
+      <h3 style="text-align: center;">Health and Fitness</h3>
+    </div>
+  </a>
+  <a href="productspage.html" style="color:black;text-decoration: none;">
+    <div class="cat_element">
+      <div class="slider">
+        <figure>
+          <img src="images\fitness1.jpeg">
+          <img src="images\fitness3.jpeg">
+          <img src="images\fitness4.png">
+          <img src="images\fitness1.jpeg">
+        </figure>
+      </div>
+      <h3 style="text-align: center;">Health and Fitness</h3>
+    </div>
+  </a>
+  <a href="productspage.html" style="color:black;text-decoration: none;">
+    <div class="cat_element">
+      <div class="slider">
+        <figure>
+          <img src="images\fitness1.jpeg">
+          <img src="images\fitness3.jpeg">
+          <img src="images\fitness4.png">
+          <img src="images\fitness1.jpeg">
+        </figure>
+      </div>
+      <h3 style="text-align: center;">Health and Fitness</h3>
+    </div>
+  </a>
+</div>
+  <br><BR><BR><BR><BR><BR><BR><BR><BR><BR>
+  <footer>
+    <div class="about">
+      <h3 align="center">SHAHID STORE</h3>
+      <p>SHAHID STORE offers quality products at great prices with exceptional customer service.
+        Shop with confidence and discover the best deals today! <br><a href="">Privacy Policy</a><br><a
+          href="">support</a></p>
+    </div>
+    <div class="links">
+      <h3 align="center">Connect with us</h3>
+      <p align="center">
+        <i class="fa-brands fa-instagram fa-2xl" style="color: #f019e9;"></i>
+        <i class="fa-brands fa-facebook fa-2xl" style="color: #1f11df;"></i>
+        <i class="fa-brands fa-telegram fa-2xl" style="color: #74C0FC;"></i>
+        <i class="fa-brands fa-x-twitter fa-2xl" style="color:black"></i>
+      </p>
+    </div>
+    <div class="other">
+      <h3 align="center">Contact us</h3>
+      <p align="center"><i class="fa-solid fa-phone"></i>+91 7623987112
+        <i class="fa-solid fa-phone"></i>+91 998712764
+        <br><i class="fa-solid fa-envelope"></i> <a href="">sstoref1@gmail.com</a>
+      </p>
+    </div>
+  </footer>
+</body>
+
+</html>
