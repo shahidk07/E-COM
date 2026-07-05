@@ -1,0 +1,65 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+
+# Django
+db.sqlite3
+db.sqlite3-journal
+
+# Django Media Files
+media/
+
+# Static Files Collected for Production
+staticfiles/
+
+# Environment Variables
+.env
+.env.*
+
+# VS Code
+.vscode/
+
+# JetBrains IDEs
+.idea/
+
+# Linux
+*~
+*.swp
+*.swo
+
+# macOS
+.DS_Store
+
+# Logs
+*.log
+
+# Build / Distribution
+build/
+dist/
+*.egg-info/
+
+# Coverage
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Migrations (optional)
+# Uncomment only if you don't want migrations in git
+# */migrations/*
+# !*/migrations/__init__.py
+
+# Node/Tailwind (if you install Tailwind via npm)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Tailwind build output (optional)
+# static/css/output.css

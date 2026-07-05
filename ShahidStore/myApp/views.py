@@ -4,3 +4,6 @@ from django.shortcuts import render
 
 def home(request):
     return render(request, 'home_page.html')
+
+def catalog(request):
+    return render(request, 'products.html')
