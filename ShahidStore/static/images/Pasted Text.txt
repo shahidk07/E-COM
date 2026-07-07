@@ -1,0 +1,32 @@
+<nav class="bg-white shadow-sm border-b">
+    <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+
+        <!-- Logo -->
+        <a href="/" class="flex items-center">
+            <img
+                src="{% static 'images/shahid-logo.png' %}"
+                alt="Shahid Enterprises"
+                class="h-12 w-auto">
+        </a>
+
+        <!-- Navigation -->
+        <div class="hidden md:flex items-center gap-8">
+            <a href="/" class="hover:text-cyan-600">Home</a>
+            <a href="/products/" class="hover:text-cyan-600">Products</a>
+            <a href="/categories/" class="hover:text-cyan-600">Categories</a>
+            <a href="/contact/" class="hover:text-cyan-600">Contact</a>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex items-center gap-4">
+            <button class="hover:text-cyan-600">
+                Cart
+            </button>
+
+            <button class="px-4 py-2 bg-cyan-600 text-white rounded-lg">
+                Login
+            </button>
+        </div>
+
+    </div>
+</nav>

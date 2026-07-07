@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product Catalog</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+.category-btn.active{
+    background:#0891b2;
+    color:white;
+}
+</style>
+
+</head>
+<body class="bg-slate-50">
+
+<!-- Navbar -->
+<nav class="bg-white shadow-sm border-b">
+    <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+
+        <!-- Logo -->
+        <a href="/" class="flex items-center">
+            <img
+                src="../static/images/brand_logo.png"
+                alt="Shahid Enterprises"
+                class="h-12 w-auto">
+        </a>
+
+        <!-- Navigation -->
+        <div class="hidden md:flex items-center gap-8">
+            <a href="/" class="hover:text-cyan-600">Home</a>
+            <a href="/products/" class="hover:text-cyan-600">Products</a>
+            <a href="/categories/" class="hover:text-cyan-600">Categories</a>
+            <a href="/contact/" class="hover:text-cyan-600">Contact</a>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex items-center gap-4">
+            <button class="hover:text-cyan-600">
+                Cart
+            </button>
+
+            <button class="px-4 py-2 bg-cyan-600 text-white rounded-lg">
+                Login
+            </button>
+        </div>
+
+    </div>
+</nav>
+
+<!-- Hero -->
+<section class="bg-gradient-to-r from-cyan-500 to-blue-600 text-white">
+
+    <div class="max-w-7xl mx-auto px-6 py-20">
+
+        <h1 class="text-5xl font-bold">
+            Discover Amazing Products
+        </h1>
+
+        <p class="mt-4 text-lg text-cyan-100 max-w-2xl">
+            Electronics, Fashion, Beauty, Home, Sports and much more.
+        </p>
+
+        <button class="mt-8 px-6 py-3 bg-white text-cyan-600 rounded-xl font-semibold">
+            Shop Now
+        </button>
+
+    </div>
+
+</section>
+
+<!-- Content -->
+<section class="max-w-7xl mx-auto px-6 py-10">
+
+    <!-- Search + Sort -->
+    <div class="flex flex-col md:flex-row gap-4 justify-between mb-8">
+
+        <input
+            id="searchInput"
+            type="text"
+            placeholder="Search products..."
+            class="w-full md:w-96 px-4 py-3 border rounded-xl">
+
+        <select
+            id="sortSelect"
+            class="px-4 py-3 border rounded-xl bg-white">
+
+            <option value="">Sort By</option>
+            <option value="name">Name</option>
+            <option value="priceLow">Price Low → High</option>
+            <option value="priceHigh">Price High → Low</option>
+
+        </select>
+
+    </div>
+
+    <!-- Categories -->
+    <div class="flex flex-wrap gap-3 mb-10">
+
+        <button class="category-btn active px-4 py-2 bg-white border rounded-full" data-category="all">All</button>
+        
+        {% for category in categories %}
+        <button class="category-btn  px-4 py-2 bg-white border rounded-full" data-category="{{category}}">{{category}}</button>
+        {% endfor  %}
+        
+    </div>
+
+    <!-- Product Grid -->
+    <div
+        id="productGrid"
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
+        <!-- Product 1 -->
+        {% for product in products %}
+        <div
+            class="product-card bg-white rounded-2xl overflow-hidden shadow hover:shadow-xl transition flex flex-col"
+            data-name="gaming laptop"
+            data-price="999"
+            data-category="{{ product.category }}">
+
+            <img
+                src="{{ product.image_url }}" alt="{{ product.name }}"
+                class="w-full h-60 object-cover">
+
+            <div class="p-5 flex-col flex-grow">
+
+                <span class="text-xs text-cyan-600 font-semibold uppercase">
+                    {{product.category}}
+                </span>
+
+                <h3 class="font-bold text-lg mt-2  min-h-[60px] line-clamp-2">
+                    {{ product.name}}
+                </h3>
+
+                <div class="mt-auto">
+                <p class="text-2xl font-bold mt-3">
+                     ₹{{ product.price }}
+                </p>
+
+                <button class="w-full mt-4 bg-cyan-600 text-white py-3 rounded-xl">
+                    View Product
+                </button>
+            </div>
+            </div>
+            </div>
+        {% endfor %}
+        </div>
+
+
+
+    </div>
+
+</section>
+
+<script>
+
+const buttons=document.querySelectorAll('.category-btn');
+const cards=document.querySelectorAll('.product-card');
+
+buttons.forEach(button=>{
+    button.addEventListener('click',()=>{
+        const selectedCategory=button.dataset.category;
+        
+        cards.forEach(card=>{
+            if(card.dataset.category==selectedCategory||selectedCategory === "all" ){
+                card.style.display='block';
+            }
+            else{
+                card.style.display="none";
+            }
+        })
+    })
+})
+
+</script>
+
+</body>
+</html>
