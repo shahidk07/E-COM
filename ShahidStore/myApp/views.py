@@ -13,6 +13,15 @@ def catalog(request):
     "Home": ["furniture_home","kitchen_dining",],
     "Sports": ["sports_outdoors",],
 }
-    
-    products=Product.objects.all()
-    return render(request, 'catalog.html',{"products":products,"categories":CATEGORY_MAP.keys()})
+    selected=request.GET.get("category")
+
+    if selected and selected in CATEGORY_MAP:
+        products=Product.objects.filter(
+            category__in=CATEGORY_MAP[selected]
+        )
+    else:
+        products=Product.objects.all()
+    return render(request, 'catalog.html',
+                  {"products":products,
+                   "categories":CATEGORY_MAP.keys(),
+                    "selected_category":selected})

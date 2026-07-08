@@ -100,10 +100,12 @@
     <!-- Categories -->
     <div class="flex flex-wrap gap-3 mb-10">
 
-        <button class="category-btn active px-4 py-2 bg-white border rounded-full" data-category="all">All</button>
+        <a href="/catalog/" class="category-btn {% if not selected_category %}active{% endif %} px-4 py-2 bg-white border rounded-full" >All</a>
         
         {% for category in categories %}
-        <button class="category-btn  px-4 py-2 bg-white border rounded-full" data-category="{{category}}">{{category}}</button>
+        <a href="?category={{category}}" class="category-btn {% if category == selected_category %}active{% endif %} px-4 py-2 bg-white border rounded-full">
+            {{ category }}
+        </a>
         {% endfor  %}
         
     </div>
@@ -158,22 +160,20 @@
 <script>
 
 const buttons=document.querySelectorAll('.category-btn');
-const cards=document.querySelectorAll('.product-card');
 
-buttons.forEach(button=>{
+buttons.forEach(button => {
     button.addEventListener('click',()=>{
-        const selectedCategory=button.dataset.category;
-        
-        cards.forEach(card=>{
-            if(card.dataset.category==selectedCategory||selectedCategory === "all" ){
-                card.style.display='block';
-            }
-            else{
-                card.style.display="none";
-            }
-        })
+        button.classList.toggle('active');
     })
-})
+});
+
+const sortSelect=document.getElementById("sortSelect");
+
+sortSelect.addEventListener("change",()=>{
+    const url=new URL(window.location);
+    url.searchParams.set("sort",sortSelect.value);
+    window.location=url;
+});
 
 </script>
 
