@@ -14,6 +14,7 @@ def catalog(request):
     "Sports": ["sports_outdoors",],
 }
     selected=request.GET.get("category")
+    sort = request.GET.get("sort")
 
     if selected and selected in CATEGORY_MAP:
         products=Product.objects.filter(
@@ -21,6 +22,17 @@ def catalog(request):
         )
     else:
         products=Product.objects.all()
+    
+    if sort=="name":
+        products=products.order_by("name")
+    
+    elif sort =="priceLow":
+        products=products.order_by("price")
+    
+    elif sort== "priceHigh":
+        products=products.order_by("-price")
+        
+
     return render(request, 'catalog.html',
                   {"products":products,
                    "categories":CATEGORY_MAP.keys(),
