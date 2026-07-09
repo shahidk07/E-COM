@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from .models import Product
+from django.core.paginator import Paginator
 # Create your views here.
 
 def home(request):
@@ -12,16 +13,20 @@ def catalog(request):
     "Beauty": ["beauty_skincare", ],
     "Home": ["furniture_home","kitchen_dining",],
     "Sports": ["sports_outdoors",],
-}
+}   
+    products = Product.objects.all()
+    search=request.GET.get("search")
     selected=request.GET.get("category")
     sort = request.GET.get("sort")
+    
+    if search:
+        products=products.filter(
+            name__icontains=search)
 
     if selected and selected in CATEGORY_MAP:
-        products=Product.objects.filter(
+        products=products.filter(
             category__in=CATEGORY_MAP[selected]
         )
-    else:
-        products=Product.objects.all()
     
     if sort=="name":
         products=products.order_by("name")
@@ -32,8 +37,12 @@ def catalog(request):
     elif sort== "priceHigh":
         products=products.order_by("-price")
         
+    paginator=Paginator(products,20)
+    page_number=page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
 
     return render(request, 'catalog.html',
-                  {"products":products,
+                  {"products":page_obj,
+                   "page_obj":page_obj,
                    "categories":CATEGORY_MAP.keys(),
                     "selected_category":selected})

@@ -81,6 +81,7 @@
         <input
             id="searchInput"
             type="text"
+            value="{{ search_query|default:'' }}"
             placeholder="Search products..."
             class="w-full md:w-96 px-4 py-3 border rounded-xl">
 
@@ -149,11 +150,32 @@
             </div>
             </div>
         {% endfor %}
-        </div>
-
-
-
     </div>
+    
+<!-- ********Pagination******* -->
+
+<div class="flex justify-center items-center gap-4 mt-10">
+    {% if page_obj.has_previous %}
+    <a href="?page={{page_ob.previous_page_number}}"
+       class="px-4 py-2 bg-white border rounded-lg shadow-sm hover:bg-cyan-600 hover:text-white transition">
+        ← Previous
+    </a>
+    {% endif %}
+
+    <span class="px-4 py-2 bg-cyan-600 text-white rounded-lg font-semibold">
+        Page {{products.number}}
+        of
+        {{products.paginator.num_pages}}
+    </span>
+
+  {% if products.has_next %}
+    <a href="?page={{products.next_page_number}}"
+       class="px-4 py-2 bg-white border rounded-lg shadow-sm hover:bg-cyan-600 hover:text-white transition">
+        Next →
+    </a>
+  {% endif %}
+
+</div>
 
 </section>
 
@@ -174,6 +196,22 @@ sortSelect.addEventListener("change",()=>{
     url.searchParams.set("sort",sortSelect.value);
     window.location=url;
 });
+
+//searching
+
+const searchInput=document.getElementById("searchInput");
+
+searchInput.addEventListener("keydown",(event)=>{
+    if(event.key==="Enter"){
+    
+    const query=searchInput.value.trim();
+    if(!query) return;
+
+    const url=new URL(window.location);
+    url.searchParams.set("search",query);
+    window.location=url;
+    }
+})
 
 </script>
 
