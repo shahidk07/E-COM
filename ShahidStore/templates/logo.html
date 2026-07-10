@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.tailwindcss.com"></script>
+<title>SHAHID</title>
+<style>
+.logo-text{
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 900;
+    font-style: italic;
+}
+</style>
+</head>
+<body class="bg-white min-h-screen flex items-center justify-center">
+
+<div class="flex items-center gap-6">
+
+<svg width="190" height="190" viewBox="0 0 220 220" fill="none">
+
+    <defs>
+        <linearGradient id="blueGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#1f9cff"/>
+            <stop offset="100%" stop-color="#0c55dd"/>
+        </linearGradient>
+
+        <linearGradient id="wingGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#1f9cff"/>
+            <stop offset="100%" stop-color="#000"/>
+        </linearGradient>
+    </defs>
+
+    <!-- blue body -->
+    <path
+        d="
+        M110 25
+        C122 25 130 30 138 40
+        L186 94
+        C194 102 194 116 186 124
+        L165 145
+        C153 157 134 157 122 145
+        L74 92
+        C64 82 64 67 74 57
+        L95 35
+        C100 29 105 25 110 25
+        Z"
+        fill="url(#blueGrad)"
+    />
+
+    <!-- black body -->
+    <path
+        d="
+        M130 52
+        L192 118
+        C198 125 198 137 190 145
+        L171 163
+        C159 175 140 175 128 163
+        L92 126
+        Z"
+        fill="#000"
+    />
+
+    <!-- white cut -->
+    <rect
+        x="102"
+        y="38"
+        width="28"
+        height="112"
+        rx="14"
+        fill="#f5f5f5"
+        transform="rotate(-42 102 38)"
+    />
+
+    <!-- speed wing -->
+    <path
+        d="
+        M8 82
+        L68 82
+        L84 100
+        L68 118
+        L8 118
+        L34 108
+        L0 100
+        L34 92
+        Z"
+        fill="url(#wingGrad)"
+    />
+
+    <path d="M0 76 L40 76 L26 84 L0 84 Z" fill="#1f6fe5"/>
+    <path d="M0 92 L30 92 L18 98 L0 98 Z" fill="#185dc5"/>
+    <path d="M0 108 L30 108 L18 114 L0 114 Z" fill="#11489b"/>
+
+    <!-- holes -->
+    <rect x="38" y="94" width="22" height="8" rx="4" fill="white"/>
+    <rect x="18" y="144" width="22" height="8" rx="4" fill="white"/>
+
+</svg>
+
+<div>
+    <h1 class="logo-text text-[110px] leading-none">
+        SHAHID
+    </h1>
+
+    <div class="text-[42px] text-gray-500 leading-none -mt-2">
+        شاهد (Witness) to Growth
+    </div>
+</div>
+
+</div>
+
+</body>
+</html>

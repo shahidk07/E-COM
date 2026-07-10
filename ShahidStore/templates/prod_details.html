@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product Details</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+</head>
+
+<body class="bg-slate-50">
+
+<!-- Navbar -->
+<nav class="bg-white border-b shadow-sm">
+    <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+
+        <h1 class="text-3xl font-bold">
+            <span class="text-black">Shahid</span>
+            <span class="text-cyan-600">Store</span>
+        </h1>
+
+        <div class="hidden md:flex gap-8">
+            <a href="#" class="hover:text-cyan-600">Home</a>
+            <a href="#" class="hover:text-cyan-600">Products</a>
+            <a href="#" class="hover:text-cyan-600">Categories</a>
+        </div>
+
+        <button class="px-4 py-2 bg-cyan-600 text-white rounded-lg">
+            Cart
+        </button>
+
+    </div>
+</nav>
+
+<!-- Breadcrumb -->
+<div class="max-w-7xl mx-auto px-6 py-6 text-sm text-gray-500">
+
+    Home >
+    Electronics >
+    Product
+
+</div>
+
+<!-- Product Section -->
+<section class="max-w-7xl mx-auto px-6 py-8">
+
+    <div class="grid lg:grid-cols-12 gap-8">
+
+        <!-- LEFT -->
+        <div class="lg:col-span-7">
+
+            <div class="bg-stone-100 rounded-2xl overflow-hidden">
+
+                <img
+                    src="{{ product.image_url }}"
+                    alt="{{ product.name }}"
+                    class="w-full aspect-square object-cover">
+
+            </div>
+
+        </div>
+
+        <!-- RIGHT -->
+        <div class="lg:col-span-5">
+
+            <span
+                class="inline-block bg-cyan-100 text-cyan-700 text-xs px-3 py-1 rounded-full">
+
+                {{ product.category }}
+
+            </span>
+
+            <h1 class="text-5xl font-bold mt-4">
+                {{ product.name }}
+            </h1>
+
+            <p class="text-gray-500 mt-4">
+                {{ product.description|truncatechars:120 }}
+            </p>
+
+            <p class="text-5xl font-bold mt-8">
+                ₹{{ product.price }}
+            </p>
+
+            <div class="flex items-center gap-2 mt-4">
+                <span class="text-green-600">
+                    ✓ In Stock
+                </span>
+
+                <span class="text-gray-400">
+                    • {{ product.stock }} left
+                </span>
+            </div>
+
+            <!-- Quantity -->
+            <div class="mt-8">
+
+                <p class="mb-3 font-medium">
+                    Quantity
+                </p>
+
+                <div class="inline-flex border rounded-lg overflow-hidden">
+
+                    <button
+                        id="minusBtn"
+                        class="w-12 h-12 hover:bg-gray-100">
+                        −
+                    </button>
+
+                    <span
+                        id="quantity"
+                        class="w-12 flex items-center justify-center">
+                        1
+                    </span>
+
+                    <button
+                        id="plusBtn"
+                        class="w-12 h-12 hover:bg-gray-100">
+                        +
+                    </button>
+
+                </div>
+
+            </div>
+
+            <!-- Buttons -->
+            <div class="grid grid-cols-2 gap-4 mt-8">
+
+                <button
+                    class="bg-cyan-600 text-white py-4 rounded-xl hover:bg-cyan-700">
+
+                    Add To Cart
+
+                </button>
+
+                <button
+                    class="border py-4 rounded-xl hover:bg-gray-50">
+
+                    Add to Wishlist
+
+                </button>
+
+            </div>
+
+            <!-- Benefits -->
+            <div
+                class="mt-8 border rounded-2xl p-6 bg-slate-50">
+
+                <div class="space-y-5">
+
+                    <div>
+                        <h4 class="font-medium">
+                            🚚 Free Delivery
+                        </h4>
+
+                        <p class="text-sm text-gray-500">
+                            On orders above ₹499
+                        </p>
+                    </div>
+
+                    <div>
+                        <h4 class="font-medium">
+                            🔄 7 Days Return
+                        </h4>
+
+                        <p class="text-sm text-gray-500">
+                            No questions asked
+                        </p>
+                    </div>
+
+                    <div>
+                        <h4 class="font-medium">
+                            🔒 Secure Payment
+                        </h4>
+
+                        <p class="text-sm text-gray-500">
+                            100% secure payments
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- Reviews -->
+
+<section class="max-w-7xl mx-auto px-6 mt-8 mb-16">
+
+    <div class="bg-white border rounded-2xl p-8">
+
+        <h2 class="text-2xl font-bold mb-4">
+            Customer Reviews
+        </h2>
+
+        <p class="text-gray-500">
+
+            ☆☆☆☆☆ No reviews yet
+
+        </p>
+
+        <p class="text-gray-400 mt-2">
+
+            Be the first to review this product.
+
+        </p>
+
+    </div>
+
+</section>
+<script>
+
+let quantity = 1;
+
+const quantityElement =
+document.getElementById("quantity");
+
+document
+.getElementById("plusBtn")
+.addEventListener("click", () => {
+
+    quantity++;
+
+    quantityElement.textContent =
+    quantity;
+
+});
+
+document
+.getElementById("minusBtn")
+.addEventListener("click", () => {
+
+    if(quantity > 1){
+
+        quantity--;
+
+        quantityElement.textContent =
+        quantity;
+    }
+
+});
+
+</script>
+
+</body>
+</html>
