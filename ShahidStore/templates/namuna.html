@@ -1,0 +1,406 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shahid Store</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        .hero-banner{
+    background:
+    linear-gradient(
+        135deg,
+        #0b1220,
+        #111827,
+        #1f2937
+    );
+}
+
+.floating{
+    animation: float 4s ease-in-out infinite;
+}
+
+@keyframes float{
+
+    0%{
+        transform:translateY(0);
+    }
+
+    50%{
+        transform:translateY(-10px);
+    }
+
+    100%{
+        transform:translateY(0);
+    }
+
+}
+    </style>
+</head>
+
+<body class="bg-slate-50">
+
+<!-- NAVBAR -->
+
+<nav class="bg-[#0b1220] text-white">
+
+    <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+
+        <h1 class="text-3xl font-bold">
+            Shahid <span class="text-orange-500">Store</span>
+        </h1>
+
+        <input
+            type="text"
+            placeholder="Search products..."
+            class="w-96 px-4 py-2 rounded-lg text-black">
+
+        <div class="flex gap-8">
+
+            <a href="/cart/">Cart</a>
+            <a href="#">Profile</a>
+            <a href="#">Settings</a>
+
+        </div>
+
+    </div>
+
+</nav>
+
+<!-- MENU -->
+
+<div class="bg-[#0b1220] text-white border-t border-slate-700">
+
+    <div class="max-w-7xl mx-auto px-6 py-3 flex gap-8">
+
+        <a href="/">Home</a>
+        <a href="/catalog/">Catalog</a>
+        <a href="#">Categories</a>
+        <a href="#">About Us</a>
+
+    </div>
+
+</div>
+
+<!-- HERO -->
+
+<section class="max-w-7xl mx-auto px-6 py-8">
+
+    <div
+        class="hero-banner rounded-3xl overflow-hidden p-10 grid lg:grid-cols-2 items-center">
+
+        <div>
+
+            <span
+                class="bg-orange-500/20 text-orange-300 px-3 py-1 rounded-full text-sm">
+
+                Welcome To Shahid Store
+
+            </span>
+
+            <h1
+                class="text-6xl font-bold mt-6 text-white">
+
+                Discover Amazing
+                <span class="text-orange-500">
+                    Products
+                </span>
+
+            </h1>
+
+            <p
+                class="text-slate-300 mt-6 max-w-lg">
+
+                Explore electronics,
+                fashion, beauty, home and
+                sports products.
+
+            </p>
+
+            <a
+                href="/catalog/"
+                class="inline-block mt-8 bg-orange-500 px-8 py-4 rounded-xl text-white font-semibold">
+
+                Catalog
+
+            </a>
+
+        </div>
+
+        <div>
+
+            <img
+                src="{% static 'images/hero.png' %}"
+                class="w-full floating">
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- NEW ARRIVALS -->
+
+<section class="max-w-7xl mx-auto px-6">
+
+    <div class="flex justify-between mb-6">
+
+        <h2 class="text-3xl font-bold">
+            New Arrivals
+        </h2>
+
+        <a href="/catalog/"
+           class="text-orange-500">
+            View All →
+        </a>
+
+    </div>
+
+    <div
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-5">
+
+        {% for product in new_products %}
+
+        <div
+            class="bg-white rounded-2xl shadow hover:shadow-xl transition overflow-hidden">
+
+            <img
+                src="{{ product.image_url }}"
+                class="w-full h-48 object-cover">
+
+            <div class="p-4">
+
+                <h3 class="font-semibold line-clamp-2">
+                    {{ product.name }}
+                </h3>
+
+                <p
+                    class="text-slate-500 text-sm mt-1">
+                    {{ product.category }}
+                </p>
+
+                <p
+                    class="font-bold text-xl mt-3">
+                    ₹{{ product.price }}
+                </p>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</section>
+
+<!-- CATEGORIES -->
+
+<section class="max-w-7xl mx-auto px-6 py-12">
+
+    <div class="flex justify-between mb-6">
+
+        <h2 class="text-3xl font-bold">
+            Browse Categories
+        </h2>
+
+    </div>
+
+    <div
+        class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-5">
+
+        {% for category in categories %}
+
+    <a
+        href="/catalog/?category={{ category.name }}"
+        class="bg-white rounded-2xl overflow-hidden shadow hover:shadow-xl transition">
+
+        <img
+            src="{% static category.image %}"
+            alt="{{ category.name }}"
+            class="w-full h-40 object-cover">
+
+        <div class="p-4">
+
+            <h3 class="font-semibold text-center text-lg">
+                {{ category.name }}
+            </h3>
+
+        </div>
+
+    </a>
+
+    {% endfor %}
+
+    </div>
+
+</section>
+
+<!-- FOOTER -->
+<footer class="bg-[#020817] text-white mt-16">
+
+    <div class="max-w-7xl mx-auto px-8 py-10">
+
+        <div class="grid md:grid-cols-5 gap-10 items-start">
+
+            <!-- Brand -->
+
+            <div>
+
+                <h2 class="text-4xl font-bold">
+                    Shahid
+                    <span class="text-orange-500">
+                        Store
+                    </span>
+                </h2>
+
+                <p class="mt-4 text-slate-400">
+                    One stop shop for quality products.
+                </p>
+
+                <p class="mt-10 text-slate-500 text-sm">
+                    © 2024 Shahid Store.
+                    All rights reserved.
+                </p>
+
+            </div>
+
+            <!-- Quick Links -->
+
+            <div>
+
+                <h3 class="font-semibold text-xl mb-4">
+                    Quick Links
+                </h3>
+
+                <div class="space-y-3">
+
+                    <a href="/" class="block text-slate-300 hover:text-orange-500">
+                        Home
+                    </a>
+
+                    <a href="/catalog/" class="block text-slate-300 hover:text-orange-500">
+                        Catalog
+                    </a>
+
+                </div>
+
+            </div>
+
+            <!-- Categories -->
+
+            <div>
+
+                <h3 class="font-semibold text-xl mb-4">
+                    Categories
+                </h3>
+
+                <div class="space-y-3">
+
+                    <a href="#" class="block text-slate-300 hover:text-orange-500">
+                        Electronics
+                    </a>
+
+                    <a href="#" class="block text-slate-300 hover:text-orange-500">
+                        Fashion
+                    </a>
+
+                    <a href="#" class="block text-slate-300 hover:text-orange-500">
+                        Beauty
+                    </a>
+
+                    <a href="#" class="block text-slate-300 hover:text-orange-500">
+                        Home
+                    </a>
+
+                    <a href="#" class="block text-slate-300 hover:text-orange-500">
+                        Sports
+                    </a>
+
+                </div>
+
+            </div>
+
+            <!-- Contact -->
+
+            <div>
+
+                <h3 class="font-semibold text-xl mb-4">
+                    Contact
+                </h3>
+
+                <div class="space-y-4 text-slate-300">
+
+                    <p>
+                        📧 store@email.com
+                    </p>
+
+                    <p>
+                        📞 +91 98765 43210
+                    </p>
+
+                    <p>
+                        📍 India
+                    </p>
+
+                </div>
+
+            </div>
+
+            <!-- Payments -->
+
+            <div>
+
+                <h3 class="font-semibold text-xl mb-4">
+                    We Accept
+                </h3>
+
+                <div class="grid grid-cols-2 gap-3">
+
+                    <div
+                        class="bg-white text-black rounded-xl px-4 py-3 text-center font-semibold">
+
+                        GPay
+
+                    </div>
+
+                    <div
+                        class="bg-white text-black rounded-xl px-4 py-3 text-center font-semibold">
+
+                        PhonePe
+
+                    </div>
+
+                    <div
+                        class="bg-white text-black rounded-xl px-4 py-3 text-center font-semibold">
+
+                        Paytm
+
+                    </div>
+
+                    <div
+                        class="bg-white text-black rounded-xl px-4 py-3 text-center font-semibold">
+
+                        UPI
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</footer>
+
+<script src="{% static 'js/home.js' %}"></script>
+
+</body>
+</html>

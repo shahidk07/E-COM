@@ -25,4 +25,5 @@ http://127.0.0.1:8000/orders/
 urlpatterns = [
     path('', views.home, name='home'),
     path('catalog/', views.catalog, name='catalog'),
+     path('details/<int:id>/', views.details, name='details'),
 ]

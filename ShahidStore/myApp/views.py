@@ -1,10 +1,27 @@
 from django.shortcuts import render
+from requests import request
 from .models import Product
 from django.core.paginator import Paginator
 # Create your views here.
 
 def home(request):
-    return render(request, 'home_page.html')
+    new_products=Product.objects.order_by("-created_at")[:6]
+    categories = [
+        "Electronics",
+        "Fashion",
+        "Beauty",
+        "Home",
+        "Sports"
+    ]
+    
+    return render(
+        request,
+        "namuna.html",
+        {
+            "new_products": new_products,
+            "categories": categories
+        }
+    )
 
 def catalog(request):
     CATEGORY_MAP = {
@@ -46,3 +63,8 @@ def catalog(request):
                    "page_obj":page_obj,
                    "categories":CATEGORY_MAP.keys(),
                     "selected_category":selected})
+
+
+def details(request,id):
+    product=Product.objects.get(id=id)
+    return render(request,'prod_details.html',{"product":product})
