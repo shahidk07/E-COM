@@ -68,3 +68,6 @@ def catalog(request):
 def details(request,id):
     product=Product.objects.get(id=id)
     return render(request,'prod_details.html',{"product":product})
+
+def cart(request):
+    
