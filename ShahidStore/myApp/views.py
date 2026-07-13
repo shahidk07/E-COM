@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from requests import request
 from .models import Product
+from django.core.mail import send_mail
 from django.core.paginator import Paginator
 # Create your views here.
 
@@ -69,5 +70,37 @@ def details(request,id):
     product=Product.objects.get(id=id)
     return render(request,'prod_details.html',{"product":product})
 
-def cart(request):
+# def cart(request):
     
+
+
+# def signin(request):
+#     return render(request,'loginpage.html')
+
+
+def signup(request):
+    if(request.method=="POST"):
+        email=request.POST.get("email")
+        import random
+        otp=random.randint(100000,999999)
+        send_mail("Shahid Store OTP Verification",
+              f"Your OTP is {otp}", "viperoflegendkiller@gmail.com",
+        [email],
+        fail_silently=False,)
+
+        request.session["otp"]=str(otp)
+        request.session["signup_email"]=email
+        return render(request,"verify.html")
+    
+    return render(request,'signup.html')
+
+def verify(request):
+    if(request.method=="POST"):
+        otp=request.session["otp"]
+        entered_otp=request.POST.get("otp")
+        if(otp==entered_otp):
+            return(request,{"message":"success"})
+        else:
+            return(request,{"message":"failed"})
+    else:
+        return(request,"verify.html")

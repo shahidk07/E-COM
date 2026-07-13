@@ -16,8 +16,8 @@ http://127.0.0.1:8000/catalog/
 🛒 Cart
 http://127.0.0.1:8000/cart/
 
-📦 Orders
-http://127.0.0.1:8000/orders/
+📦 signup
+http://127.0.0.1:8000/signup/
 
 ========================================
 """)
@@ -26,4 +26,7 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('catalog/', views.catalog, name='catalog'),
      path('details/<int:id>/', views.details, name='details'),
+    #  path('signin', views.signin, name='signin'),
+     path('verify/', views.verify, name='verify'),
+    #  path('cart/', views.cart, name='cart'),
 ]
