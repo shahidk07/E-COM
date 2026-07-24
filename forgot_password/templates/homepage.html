@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forgot Password</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+
+<body class="bg-slate-800 flex justify-center items-center min-h-screen">
+    <form method="POST" action="/send_otp">
+        <div class="grid gap-4 justify-items-center">
+            <div class="bg-slate-200 text-center p-4 w-[500px] rounded">
+                Enter the email id registered with your account
+            </div>
+            <input type="text" placeholder="Enter your email" class="w-[500px] p-3 rounded border bg-slate-50">
+            
+            <button type="submit" class="bg-slate-50 w-50 h-8 rounded-md cursor-pointer ">Send OTP</button>
+        </div>
+    </form>
+</body>
+
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reset</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+
+    <body class="bg-slate-800 flex justify-center items-center min-h-screen">
+    <form action='/reset' method="POST">
+        <div class="grid gap-5 justify-items-center">
+        <input name="password"  type="password" placeholder="Enter new password" class="bg-slate-50 w-120 h-10 rounded-sm">
+        <input name="confirm_password" type="password" placeholder="Confirm your password" class="bg-slate-50 w-120 h-10 rounded-sm">
+        <button type="submit" class="bg-white w-50 rounded-sm">Done</button>
+</div>
+</form>
+<script>
+    const form=document.getElementsByTagName("form")[0];
+    
+    form.addEventListener("submit",function(event){
+        const password=form.password.value;
+        const confirm_password=form.confirm_password.value;
+        if(password.length<8){
+            event.preventDefault();
+            alert("Password must more than 7 digits");
+        }
+
+        if(password!==confirm_password){
+            event.preventDefault();
+            alert("Passwords do not match");
+        }
+
+    });
+
+</script>
+</body>
+
+</html>
