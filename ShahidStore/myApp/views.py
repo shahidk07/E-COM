@@ -3,6 +3,7 @@ from requests import request
 from .models import Product
 from django.core.mail import send_mail
 from django.core.paginator import Paginator
+import psycopg2
 # Create your views here.
 
 def home(request):
@@ -90,6 +91,13 @@ def signup(request):
 
         request.session["otp"]=str(otp)
         request.session["signup_email"]=email
+
+        conn=psycopg2.connect(
+            database="shahidstore",
+            user="shahid",
+            password="12345678",
+            host="localhost",
+            port="5432",)
         return render(request,"verify.html")
     
     return render(request,'signup.html')
@@ -104,3 +112,12 @@ def verify(request):
             return(request,{"message":"failed"})
     else:
         return(request,"verify.html")
+
+def cart(request):
+    return(request,"cart_page.html")
+
+def add_to_cart(request):
+    product_id=request.POST.get(product_id)
+    quantity=request.POST.get(quantity)
+
+    db.connect()

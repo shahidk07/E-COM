@@ -61,22 +61,28 @@ button:active {background-color:dodgerblue
         <source src="videos\login.mp4" type="video/mp4">
         Your browser does not support the video tag.
     </video>
-    <form action="/signup/" method="post">
+    <form action="/signup/" method="post" name="form">
          {% csrf_token %}
         <h2>CREATE AN ACCOUNT</h2>
         <div class="form-group">
-            <input type="text" placeholder="Email" name="email">
+            <input type="text" placeholder="Fist Name" name="first_name" required>
         </div>
         <div class="form-group">
-            <input type="password" placeholder="Password" name="password">
+            <input type="text" placeholder="Last Name" name="last_name" required>
         </div>
         <div class="form-group">
-            <input type="number" placeholder="Age">
+            <input type="password" placeholder="Password" name="password" required>
+        </div>
+        <div class="form-group">
+            <input type="text" placeholder="Email" name="email" required>
+        </div>
+        <div class="form-group">
+            <input type="number" placeholder="Age" required name="age">
         </div>
         <p><input type="checkbox"> Remember me </p>
-        <button type="submit">Send OTP</button>
-        <p>Already Registered?<a href="loginpage.html">Login</a></p>
+        <button type="submit" id="submit">Send OTP</button>
+        <p>Already Registered?<a href='/login/'>Login</a></p>
     </form>
 
-
 </body>
+</html>
