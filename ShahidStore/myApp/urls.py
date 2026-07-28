@@ -29,7 +29,7 @@ urlpatterns = [
     path('signup/', views.signup, name='signup'),
     path('verify/', views.verify, name='verify'),
     path("cart/", views.cart, name="cart"),
-    path("cart/add/", views.add_to_cart, name="add_to_cart"),
+    # path("cart/add/", views.add_to_cart, name="add_to_cart"),
     # path("cart/update/", views.update_cart, name="cart_update"),
     # path("cart/remove/", views.remove_from_cart, name="cart_remove"),
 ]

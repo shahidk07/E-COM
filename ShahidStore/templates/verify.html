@@ -9,7 +9,8 @@
 </head>
 
 <body class="bg-slate-800 flex justify-center items-center min-h-screen">
-    <form action="/verify" method="POST">
+    <form action="/verify/" method="POST">
+        {% csrf_token %}
         <div class="grid gap-4 justify-items-center">
             <div class="bg-slate-200 text-center p-4 w-[500px] rounded">
                 Enter the OTP we sent to your email id.

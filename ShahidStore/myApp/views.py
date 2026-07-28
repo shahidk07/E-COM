@@ -1,9 +1,12 @@
-from django.shortcuts import render
+from django.http import HttpResponse
+from django.shortcuts import redirect, render
 from requests import request
 from .models import Product
 from django.core.mail import send_mail
 from django.core.paginator import Paginator
 import psycopg2
+import random
+
 # Create your views here.
 
 def home(request):
@@ -78,11 +81,14 @@ def details(request,id):
 # def signin(request):
 #     return render(request,'loginpage.html')
 
-
 def signup(request):
     if(request.method=="POST"):
         email=request.POST.get("email")
-        import random
+        first_name=request.POST.get("first_name")
+        last_name=request.POST.get("last_name")
+        password=request.POST.get("password")
+
+        
         otp=random.randint(100000,999999)
         send_mail("Shahid Store OTP Verification",
               f"Your OTP is {otp}", "viperoflegendkiller@gmail.com",
@@ -90,15 +96,12 @@ def signup(request):
         fail_silently=False,)
 
         request.session["otp"]=str(otp)
-        request.session["signup_email"]=email
+        request.session["email"]=email
+        request.session["first_name"]=first_name
+        request.session["last_name"]=last_name
+        request.session["password"]=password
 
-        conn=psycopg2.connect(
-            database="shahidstore",
-            user="shahid",
-            password="12345678",
-            host="localhost",
-            port="5432",)
-        return render(request,"verify.html")
+        return redirect('/verify/')
     
     return render(request,'signup.html')
 
@@ -107,17 +110,72 @@ def verify(request):
         otp=request.session["otp"]
         entered_otp=request.POST.get("otp")
         if(otp==entered_otp):
-            return(request,{"message":"success"})
+            user_id=create_account(request)
+            return redirect("/")
         else:
-            return(request,{"message":"failed"})
+            return render(request,{"message":"failed"})
     else:
-        return(request,"verify.html")
+        return render(request,"verify.html")
 
+def create_account(request):
+    first_name=request.session["first_name"]
+    last_name=request.session["last_name"]
+    email=request.session["email"]
+    password=request.session["password"]
+
+
+    conn=psycopg2.connect(
+                            database="shahidstore",
+                            user="shahid",
+                            password="12345678",
+                            host="localhost",
+                            port="5432",)
+    try:
+        curr=conn.cursor()
+        #create user and get user_id
+        curr.execute("""INSERT INTO storeusers(first_name,last_name,email,password)
+          VALUES(%s,%s,%s,%s) RETURNING user_id;
+        """,(first_name,last_name,email,password))
+   
+        user_id=curr.fetchone()[0]
+
+        #create a new cart for new user
+        curr.execute("""
+                INSERT INTO store_cart(user_id)
+                VALUES (%s);""", (user_id,))
+            
+        conn.commit()
+
+        #remove temporary sessions
+        for key in ("otp","email","first_name","last_name","password"):
+            request.session.pop(key,None)
+
+        #log the new user in    
+        request.session["user_id"]=user_id
+        request.session["is_authenticated"]=True
+        request.session["user_name"]=first_name
+
+       
+
+    except Exception:
+        conn.rollback()
+        raise
+
+    finally:
+        curr.close()
+        conn.close()
+    
+    return user_id
+
+    
+
+
+    
 def cart(request):
     return(request,"cart_page.html")
 
-def add_to_cart(request):
-    product_id=request.POST.get(product_id)
-    quantity=request.POST.get(quantity)
+# def add_to_cart(request):
+#     product_id=request.POST.get(product_id)
+#     quantity=request.POST.get(quantity)
 
-    db.connect()
+#     db.connect()
