@@ -76,10 +76,38 @@ def details(request,id):
 
 # def cart(request):
     
+def connect():
+    conn=psycopg2.connect(
+                                database="shahidstore",
+                                user="shahid",
+                                password="12345678",
+                                host="localhost",
+                                port="5432",)
+    return conn
 
 
-# def signin(request):
-#     return render(request,'loginpage.html')
+def signin(request):
+    if(request.method=="POST"):
+        email=request.POST.get("email")
+        password=request.POST.get("password")
+        
+        conn=connect()
+        curr=conn.cursor()
+        curr.execute("SELECT user_id,password from storeusers where email =%s ",(email,))
+        user=curr.fetchone()
+        if(user):
+            user_id=user[0]
+            actual_pass=user[1]
+            typed_pass=password
+            if(actual_pass==typed_pass):
+                request.session["user_id"]=user_id
+                request.session["is_authenticated"]=True
+                return redirect("/")
+            else:
+                return render(request,"loginpage.html",{"message":"Incorrect password"})
+        else:
+            return render(request,"loginpage.html",{"message":"No user is registered with this email id"})
+    return render(request,'loginpage.html')
 
 def signup(request):
     if(request.method=="POST"):
@@ -124,12 +152,7 @@ def create_account(request):
     password=request.session["password"]
 
 
-    conn=psycopg2.connect(
-                            database="shahidstore",
-                            user="shahid",
-                            password="12345678",
-                            host="localhost",
-                            port="5432",)
+    conn=connect()
     try:
         curr=conn.cursor()
         #create user and get user_id
@@ -153,7 +176,6 @@ def create_account(request):
         #log the new user in    
         request.session["user_id"]=user_id
         request.session["is_authenticated"]=True
-        request.session["user_name"]=first_name
 
        
 
@@ -179,3 +201,4 @@ def cart(request):
 #     quantity=request.POST.get(quantity)
 
 #     db.connect()
+

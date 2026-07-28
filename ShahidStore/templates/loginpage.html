@@ -54,17 +54,18 @@ button:active {background-color:dodgerblue;
     </style>
 </head>
 <body  style="background: none;">
-    <video autoplay muted loop id="background-video">
+    <!-- <video autoplay muted loop id="background-video">
         <source src="videos\login.mp4" type="video/mp4">
         Your browser does not support the video tag.
-    </video>
-    <form>
+    </video> -->
+    <form action="/signin/" method="post">
+        {% csrf_token %}
         <h2>LOGIN</h2>
         <div class="form-group">
-            <input type="text" placeholder="Email">
+            <input type="text" placeholder="Email" name="email" required>
         </div>
         <div class="form-group">
-            <input type="password" placeholder="Password">
+            <input type="password" placeholder="Password" name="password" required>
         </div>
         <p><input type="checkbox"> Remember me <a href="#">Forgot Password?</a></p>
         <button type="submit">Login</button>
