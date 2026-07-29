@@ -78,11 +78,11 @@ def details(request,id):
     
 def connect():
     conn=psycopg2.connect(
-                                database="shahidstore",
-                                user="shahid",
-                                password="12345678",
-                                host="localhost",
-                                port="5432",)
+                            database="shahidstore",
+                            user="shahid",
+                            password="12345678",
+                            host="localhost",
+                            port="5432",)
     return conn
 
 
@@ -193,12 +193,55 @@ def create_account(request):
 
 
     
-def cart(request):
-    return(request,"cart_page.html")
+# def cart(request):
+#     return(request,"cart_page.html")
 
-# def add_to_cart(request):
-#     product_id=request.POST.get(product_id)
-#     quantity=request.POST.get(quantity)
+def add_to_cart(request):
+    from django.http import JsonResponse
+    import json
+    is_authenticated=request.session.get("is_authenticated",False)
+    if(is_authenticated):
+        user_id=request.session["user_id"]
+        
+        data=json.loads(request.body)
+        product_id=data["product_id"]
+        quantity=data["quantity"]
+        conn=connect()
+        try:
+            curr=conn.cursor()
+            curr.execute("select cart_id from store_cart where user_id =%s",(user_id,))
+            cart_id=curr.fetchone()[0]
+            curr.execute(""" insert into store_cart_item(cart_id, product_id, quantity) values(%s,%s,%s) 
+            on conflict (cart_id,product_id)
+            do update set
+             quantity =store_cart_item.quantity+ excluded.quantity
 
-#     db.connect()
+             returning quantity,(xmax=0) as inserted;
+            """,(cart_id,product_id,quantity,))
 
+            new_quantity,inserted=curr.fetchone()
+            if inserted:
+                message="Item added to cart"
+            else:
+                message=f"Item quantity in cart increased by {quantity}"
+
+            #update product_stock
+            curr.execute("""update "myApp_product"
+            set stock=stock - %s where id=%s returning stock""",(quantity,product_id))
+
+            new_stock=curr.fetchone()[0]
+            conn.commit()
+            curr.close()
+            conn.close()
+            return JsonResponse({"message":message,"stock":new_stock},status=200)
+            
+        except Exception:
+            raise       
+    else:
+        return JsonResponse({"message":"Please signin again"},status=401)
+
+
+
+def logout(request):
+    request.session.flush()
+    return redirect("/signin/")

@@ -88,7 +88,7 @@
                     ✓ In Stock
                 </span>
 
-                <span class="text-gray-400">
+                <span class="text-gray-400" id="stockText">
                     • {{ product.stock }} left
                 </span>
             </div>
@@ -127,7 +127,7 @@
             <!-- Buttons -->
             <div class="grid grid-cols-2 gap-4 mt-8">
 
-                <button id= "cartbtn" class="bg-cyan-600 text-white py-4 rounded-xl hover:bg-cyan-700">
+                <button id= "cartbtn" class="bg-cyan-600 text-white py-4 rounded-xl hover:bg-cyan-700 ">
                                                      Add To Cart
                  </button>
 
@@ -216,9 +216,8 @@
 
 //product quantity handling
 let quantity = 1;
-const productStock = {{product.stock}};
-const quantityElement =
-document.getElementById("quantity");
+let productStock = {{product.stock}};
+const quantityElement =document.getElementById("quantity");
 
 //increase
 document.getElementById("plusBtn")
@@ -250,20 +249,40 @@ document.getElementById("minusBtn")
 //
 
 const cartbtn=document.getElementById("cartbtn");
+const productId={{product.id}};
 
-cartbtnaddEventListener("click",async()=>{
+cartbtn.addEventListener("click",async()=>{
 
     if(productStock>0 && productStock>=quantity){
+        try{
         const response=await fetch("/cart/add/",{
             method:"POST",
-            headers:{"Content-Type":"application/json"},
+            headers:{"Content-Type":"application/json",
+                "X-CSRFToken": "{{ csrf_token }}"},
              body:JSON.stringify({
              product_id:productId,
              quantity:quantity })
             });
-            console.log(response);} 
+            console.log(response);
             const data=await response.json();
-            console.log(data);
+            if(response.ok){
+                productStock=data.stock;
+                
+                const stockText=document.getElementById("stockText");
+                stockText.textContent=`• ${productStock} left`;
+            }   
+                alert(data.message);
+        }
+        catch(error){
+             alert(error.message);
+        }
+            
+
+        }
+    else{
+        alert("Sorry we don't have enough stock available!")
+    }
+            
 })
 
 

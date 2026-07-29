@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -54,10 +55,10 @@ button:active {background-color:dodgerblue;
     </style>
 </head>
 <body  style="background: none;">
-    <!-- <video autoplay muted loop id="background-video">
-        <source src="videos\login.mp4" type="video/mp4">
+    <video autoplay muted loop id="background-video">
+        <source src="{% static 'videos/login.mp4' %}" type="video/mp4">
         Your browser does not support the video tag.
-    </video> -->
+    </video>
     <form action="/signin/" method="post">
         {% csrf_token %}
         <h2>LOGIN</h2>
@@ -69,7 +70,7 @@ button:active {background-color:dodgerblue;
         </div>
         <p><input type="checkbox"> Remember me <a href="#">Forgot Password?</a></p>
         <button type="submit">Login</button>
-        <p>Don't have an account? <a href="signup.html">Register</a></p>
+        <p>Don't have an account? <a href="/signup/">Register</a></p>
     </form>
 </body>
 </html>
