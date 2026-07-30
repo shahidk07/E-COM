@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from requests import request
@@ -193,8 +195,31 @@ def create_account(request):
 
 
     
-# def cart(request):
-#     return(request,"cart_page.html")
+def cart(request):
+    from psycopg2.extras import RealDictCursor
+
+    user_id=request.session["user_id"]
+    conn=connect()
+    curr=conn.cursor(cursor_factory=RealDictCursor)
+    curr.execute("""select cart_id from store_cart where user_id=%s""",(user_id,))
+    cart_id=curr.fetchone()["cart_id"]
+
+    curr.execute("""select ci.cart_item_id,ci.product_id,ci.quantity,p.name,p.price,p.image_url,p.stock,p.description 
+        from store_cart_item as ci 
+        join "myApp_product" as p 
+        on ci.product_id=p.id
+        where ci.cart_id=%s""",(cart_id,))
+    
+    items=curr.fetchall()
+
+    subtotal=Decimal("0.00")
+    for item in items:
+        item["total_price"]=item["price"]*item["quantity"]
+        subtotal+=item["total_price"]
+
+    return  render(request,"cart_page.html",{"items":items,"subtotal":subtotal})
+
+
 
 def add_to_cart(request):
     from django.http import JsonResponse
