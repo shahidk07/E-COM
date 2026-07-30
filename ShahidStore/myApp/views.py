@@ -267,6 +267,25 @@ def add_to_cart(request):
 
 
 
+def update_cart(request):
+    from django.http import JsonResponse
+    import json
+    data=json.loads(request.body)
+    action=data["action"]
+    cart_item_id=data["cart_item_id"]
+
+    conn=connect()
+    curr=conn.cursor()
+    if(action=="increase"):
+        curr.execute("update store_cart_item set quantity=quantity + 1 where cart_item_id=%s returning quantity",(cart_item_id,))
+    else:
+        curr.execute("update store_cart_item set quantity=quantity - 1 where cart_item_id=%s returning quantity",(cart_item_id,))
+    quantity=curr.fetchone()[0]
+    conn.commit()
+    curr.close()
+    conn.close()
+    return JsonResponse({"quantity":quantity,"status":200})
+
 def logout(request):
     request.session.flush()
     return redirect("/signin/")
