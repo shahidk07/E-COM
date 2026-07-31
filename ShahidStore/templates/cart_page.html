@@ -40,7 +40,7 @@
 
                 <p>
                     You have
-                    <strong>{{ items|length }} item(s)</strong>
+                    <strong id="item-count">{{ items|length }} item(s)</strong>
                     in your cart
                 </p>
             </div>
@@ -437,12 +437,25 @@ async function removeFunc(item,cart_item_id){
         console.log(data);
         if(response.ok){
             item.remove();
+            document.getElementById("item-count").textContent = 
+            document.querySelectorAll(".cart-item").length + " item(s)";
             document.getElementById("subtotal").textContent =`₹${data.subtotal}`;
             document.getElementById("total").textContent =`₹${data.total}`;
+
+            
+            if (document.querySelectorAll(".cart-item").length === 0) {
+           document.querySelector(".bg-white.border.rounded-2xl.px-6").innerHTML = `
+        <div class="py-16 text-center">
+            <p class="text-xl font-semibold">Your cart is empty</p>
+            <p class="text-gray-500 mt-2">Add some products to get started.</p>
+        </div>
+    `;
+}
         }
 
 
     }
+    
 </script>
 </body>
 </html>
