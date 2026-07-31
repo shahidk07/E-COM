@@ -217,7 +217,8 @@ def cart(request):
         item["total_price"]=item["price"]*item["quantity"]
         subtotal+=item["total_price"]
 
-    return  render(request,"cart_page.html",{"items":items,"subtotal":subtotal})
+    total = subtotal  # shipping is free
+    return  render(request,"cart_page.html",{"items":items,"subtotal":subtotal,"total":total})
 
 
 
@@ -276,15 +277,69 @@ def update_cart(request):
 
     conn=connect()
     curr=conn.cursor()
+
+    # Update quantity
     if(action=="increase"):
-        curr.execute("update store_cart_item set quantity=quantity + 1 where cart_item_id=%s returning quantity",(cart_item_id,))
+        curr.execute("update store_cart_item set quantity=quantity + 1 where cart_item_id=%s returning quantity, product_id",(cart_item_id,))
     else:
-        curr.execute("update store_cart_item set quantity=quantity - 1 where cart_item_id=%s returning quantity",(cart_item_id,))
-    quantity=curr.fetchone()[0]
+        curr.execute("update store_cart_item set quantity=quantity - 1 where cart_item_id=%s returning quantity, product_id",(cart_item_id,))
+    row=curr.fetchone()
+    quantity=row[0]
+    product_id=row[1]
+
+    # Get product price and stock
+    curr.execute('select price, stock from "myApp_product" where id=%s',(product_id,))
+    product_row=curr.fetchone()
+    price=product_row[0]
+    stock=product_row[1]
+
+    item_total=price*quantity
+
+    # Get cart_id from this cart_item
+    curr.execute("select cart_id from store_cart_item where cart_item_id=%s",(cart_item_id,))
+    cart_id=curr.fetchone()[0]
+
+    # Compute subtotal from all items in the cart
+    curr.execute("""select coalesce(sum(ci.quantity * p.price), 0)
+        from store_cart_item ci
+        join "myApp_product" p on ci.product_id = p.id
+        where ci.cart_id=%s""",(cart_id,))
+    subtotal=curr.fetchone()[0]
+    total=subtotal  # shipping is free
+
     conn.commit()
     curr.close()
     conn.close()
-    return JsonResponse({"quantity":quantity,"status":200})
+    return JsonResponse({"quantity":quantity,"item_total":str(item_total),"subtotal":str(subtotal),"total":str(total),"stock":stock})
+
+def remove_from_cart(request):
+    from django.http import JsonResponse
+    import json
+    data=json.loads(request.body)
+    cart_item_id=data["cart_item_id"]
+    conn=connect()
+    curr=conn.cursor()
+
+    # Get the cart_id before deleting
+    curr.execute("select cart_id from store_cart_item where cart_item_id=%s",(cart_item_id,))
+    cart_id=curr.fetchone()[0]
+
+    # Delete the item
+    curr.execute("delete from store_cart_item where cart_item_id =%s",(cart_item_id,))
+
+    # Compute new subtotal from remaining items
+    curr.execute("""select coalesce(sum(ci.quantity * p.price), 0)
+        from store_cart_item ci
+        join "myApp_product" p on ci.product_id = p.id
+        where ci.cart_id=%s""",(cart_id,))
+    subtotal=curr.fetchone()[0]
+    total=subtotal  # shipping is free
+
+    conn.commit()
+    curr.close()
+    conn.close()
+    return JsonResponse({"subtotal":str(subtotal),"total":str(total)})
+
 
 def logout(request):
     request.session.flush()

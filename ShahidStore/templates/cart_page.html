@@ -51,7 +51,7 @@
 
                 {% for item in items %}
 
-                <div data-cart-item-id="{{item.cart_item_id}}" class="cart-item py-6 flex gap-6 border-b last:border-b-0" >
+                <div data-cart-item-id="{{item.cart_item_id}}" data-stock="{{ item.stock }}" class="cart-item py-6 flex gap-6 border-b last:border-b-0" >
 
                     <!-- Product Image -->
                     <div class="w-44 h-44 flex-shrink-0 bg-gray-100 rounded-xl overflow-hidden">
@@ -131,12 +131,12 @@
                         <div class="text-right">
 
                             <!-- Later calculate price × quantity -->
-                            <p class="font-bold text-xl mb-4">
+                            <p class="item-total font-bold text-xl mb-4">
                                 ₹{{ item.total_price }}
                             </p>
 
                             <button
-                                class="text-red-500 hover:text-red-600">
+                                class=" removeBtn text-red-500 hover:text-red-600">
                                 🗑 Remove
                             </button>
 
@@ -199,7 +199,7 @@
                         Items ({{ items|length }})
                     </span>
 
-                    <span class="font-medium">
+                    <span class="subtotal font-medium">
                         ₹{{ subtotal }}
                     </span>
 
@@ -207,13 +207,13 @@
 
 
                 <!-- Subtotal -->
-                <div class="flex justify-between mt-5">
+                <div  class="flex justify-between mt-5">
 
                     <span>
                         Subtotal
                     </span>
 
-                    <span class="font-medium">
+                    <span id="subtotal" class="font-medium">
                         ₹{{ subtotal }}
                     </span>
 
@@ -278,8 +278,8 @@
                         Total
                     </span>
 
-                    <span class="text-3xl font-bold">
-                        ₹{{ subtotal }}
+                    <span id="total" class=" text-3xl font-bold">
+                        ₹{{ total }}
                     </span>
 
                 </div>
@@ -352,39 +352,19 @@
 <script>
 //product quantity handling
 
-
-//increase
 document.querySelectorAll(".cart-item").forEach(item=>{
-    const cartItemId=item.dataset.cartItemId;
+
+    const cart_item_id = item.dataset.cartItemId;
+    let stock=Number(item.dataset.stock)
     const quantityText=item.querySelector(".quantity");
+    const itemTotal = item.querySelector(".item-total");
+    let quantity=Number(quantityText.textContent);
 
+     /////////////////////////////
+    ///////  Increase   /////////
+   /////////////////////////////    
     item.querySelector(".plusBtn").addEventListener("click",async()=>{
-       
-        const response=await fetch("/cart/update",{
-            method:"POST",
-            headers:{
-                "Content-Type":"application/json",
-                "X-CSRFToken":"{{csrf_token}}"
-            },
-            body:JSON.stringify({
-                cart_item_id:cartItemId,
-                action:"increase"
-        }
-            )
-        })
-        const data=await response.json();
-        if(response.ok){
-            quantityText.textContent=data.quantity;
-        }
-
-
-
-
-    })
-
-
-    item.querySelector(".minusBtn").addEventListener("click",async()=>{
-       
+        if(stock>0){
         const response=await fetch("/cart/update/",{
             method:"POST",
             headers:{
@@ -392,21 +372,77 @@ document.querySelectorAll(".cart-item").forEach(item=>{
                 "X-CSRFToken":"{{csrf_token}}"
             },
             body:JSON.stringify({
-                cart_item_id:cartItemId,
+                cart_item_id:cart_item_id,
+                action:"increase"
+        }
+            )
+        })
+        const data=await response.json();
+        if(response.ok){
+            quantity=data.quantity;
+            quantityText.textContent=data.quantity;
+            itemTotal.textContent=`₹${data.item_total}`;
+            document.getElementById("subtotal").textContent =`₹${data.subtotal}`;
+            document.getElementById("total").textContent =`₹${data.total}`;
+        }
+}});
+
+//////////////////////////////
+///////  Decrease    /////////
+/////////////////////////////    
+    item.querySelector(".minusBtn").addEventListener("click",async()=>{
+        if(quantity>1){
+        const response=await fetch("/cart/update/",{
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json",
+                "X-CSRFToken":"{{csrf_token}}"
+            },
+            body:JSON.stringify({
+                cart_item_id:cart_item_id,
                 action:"decrease"
         }
             )
         })
         const data=await response.json();
         if(response.ok){
-            quantityText.textContent=data.quantity;
+            quantity = data.quantity; 
+            stock=data.stock;
+            quantityText.textContent = data.quantity;
+            itemTotal.textContent = `₹${data.item_total}`;
+            document.getElementById("subtotal").textContent = `₹${data.subtotal}`;
+            document.getElementById("total").textContent = `₹${data.total}`;
         }
-
+    }
+    else{
+     removeFunc(item,cart_item_id);
+    }
     })
 
-})
+    item.querySelector(".removeBtn").addEventListener("click",()=>{
+        removeFunc(item,cart_item_id);
+    })
+
+});
+
+//remove items from dom
+async function removeFunc(item,cart_item_id){
+        const response=await fetch('/cart/remove/',{
+            method:"DELETE",
+            headers:{"Content-Type":"application/json",
+                "X-CSRFToken":"{{csrf_token}}"},
+            body:JSON.stringify({cart_item_id:cart_item_id})
+        })
+        const data=await response.json()
+        console.log(data);
+        if(response.ok){
+            item.remove();
+            document.getElementById("subtotal").textContent =`₹${data.subtotal}`;
+            document.getElementById("total").textContent =`₹${data.total}`;
+        }
 
 
+    }
 </script>
 </body>
 </html>
