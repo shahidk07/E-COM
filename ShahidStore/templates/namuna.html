@@ -61,11 +61,13 @@
             class="w-96 px-4 py-2 rounded-lg text-black">
 
         <div class="flex gap-8">
-
             <a href="/cart/">Cart</a>
-            <a href="#">Profile</a>
-            <a href="#">Settings</a>
-
+            {% if request.session.is_authenticated %}
+            <a href="/logout/">Logout</a>
+            {% else %}
+            <a href="/signin/">Sign In</a>
+            <a href="/signup/">Sign Up</a>
+            {% endif %}
         </div>
 
     </div>
@@ -80,8 +82,8 @@
 
         <a href="/">Home</a>
         <a href="/catalog/">Catalog</a>
-        <a href="#">Categories</a>
-        <a href="#">About Us</a>
+        <a href="/catalog/">Categories</a>
+        <a href="/aboutus/">About Us</a>
 
     </div>
 
@@ -302,23 +304,23 @@
 
                 <div class="space-y-3">
 
-                    <a href="#" class="block text-slate-300 hover:text-orange-500">
+                    <a href="/catalog/?category=Electronics" class="block text-slate-300 hover:text-orange-500">
                         Electronics
                     </a>
 
-                    <a href="#" class="block text-slate-300 hover:text-orange-500">
+                    <a href="/catalog/?category=Fashion" class="block text-slate-300 hover:text-orange-500">
                         Fashion
                     </a>
 
-                    <a href="#" class="block text-slate-300 hover:text-orange-500">
+                    <a href="/catalog/?category=Beauty" class="block text-slate-300 hover:text-orange-500">
                         Beauty
                     </a>
 
-                    <a href="#" class="block text-slate-300 hover:text-orange-500">
+                    <a href="/catalog/?category=Home" class="block text-slate-300 hover:text-orange-500">
                         Home
                     </a>
 
-                    <a href="#" class="block text-slate-300 hover:text-orange-500">
+                    <a href="/catalog/?category=Sports" class="block text-slate-300 hover:text-orange-500">
                         Sports
                     </a>
 

@@ -1,10 +1,11 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>About Us - Shahid Store</title>
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
@@ -12,7 +13,7 @@
         body {
             background-color: none;
             height: 600px;
-            background-image: url(back.jpeg);
+            background-image: url('{% static "images/back.jpeg" %}');
         }
 
         header {
@@ -160,7 +161,7 @@
     </style>
 </head>
 
-<body style="background-image: url(C:\Users\shahi\Downloads\back.jpeg);">
+<body style="background-image: url('{% static 'images/back.jpeg' %}'); background-size: cover; background-position: center;">
 
     <form>
 
@@ -178,13 +179,13 @@
         <h1>SHAHID STORE</h1>
         <NAV>
             <ul>
-                <li><a href="homepage.html">HOME</a></li>
-                <li><a href="productspage.html">SHOP NOW</a></li>
-                <LI><a href=" ">CART</a></LI>
-                <LI><a href="">CONTACT US</a></LI>
-                <LI><a href=""> ABOUT US</a></LI>
-                <LI><a href="signup.html">SIGN UP</a></LI>
-                <LI><a href="loginpage.html"> SIGN IN</a></LI>
+                <li><a href="/">HOME</a></li>
+                <li><a href="/catalog/">SHOP NOW</a></li>
+                <LI><a href="/cart/">CART</a></LI>
+                <LI><a href="/contact-us/">CONTACT US</a></LI>
+                <LI><a href="/aboutus/"> ABOUT US</a></LI>
+                <LI><a href="/signup/">SIGN UP</a></LI>
+                <LI><a href="/signin/"> SIGN IN</a></LI>
             </ul>
         </NAV>
     </header>
@@ -209,8 +210,8 @@
             <div class="about">
                 <h3 align="center">SHAHID STORE</h3>
                 <p>SHAHID STORE offers quality products at great prices with exceptional customer service.
-                    Shop with confidence and discover the best deals today! <br><a href="">Privacy Policy</a><br><a
-                        href="">support</a></p>
+                    Shop with confidence and discover the best deals today! <br><a href="#">Privacy Policy</a><br><a
+                        href="/contact-us/">support</a></p>
             </div>
             <div class="links">
                 <h3 align="center">Connect with us</h3>
@@ -225,7 +226,7 @@
                 <h3 align="center">Contact us</h3>
                 <p align="center"><i class="fa-solid fa-phone"></i>+91 7623987112
                     <i class="fa-solid fa-phone"></i>+91 998712764
-                    <br><i class="fa-solid fa-envelope"></i> <a href="">sstoref1@gmail.com</a>
+                    <br><i class="fa-solid fa-envelope"></i> <a href="mailto:sstoref1@gmail.com">sstoref1@gmail.com</a>
                 </p>
             </div>
         </footer>

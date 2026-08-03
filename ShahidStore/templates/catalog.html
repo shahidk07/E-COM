@@ -32,20 +32,30 @@
         <!-- Navigation -->
         <div class="hidden md:flex items-center gap-8">
             <a href="/" class="hover:text-cyan-600">Home</a>
-            <a href="/products/" class="hover:text-cyan-600">Products</a>
-            <a href="/categories/" class="hover:text-cyan-600">Categories</a>
-            <a href="/contact/" class="hover:text-cyan-600">Contact</a>
+            <a href="/catalog/" class="hover:text-cyan-600">Products</a>
+            <a href="/catalog/" class="hover:text-cyan-600">Categories</a>
+            <a href="/contact-us/" class="hover:text-cyan-600">Contact</a>
         </div>
 
         <!-- Actions -->
         <div class="flex items-center gap-4">
-            <button class="hover:text-cyan-600">
+            <a href="/cart/"><button class="hover:text-cyan-600">
                 Cart
-            </button>
+            </button></a>
 
-            <button class="px-4 py-2 bg-cyan-600 text-white rounded-lg">
-                Login
-            </button>
+            {% if request.session.is_authenticated %}
+            <a href="/logout/">
+                <button class="px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition">
+                    Logout
+                </button>
+            </a>
+            {% else %}
+            <a href="/signin/">
+                <button class="px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition">
+                    Login
+                </button>
+            </a>
+            {% endif %}
         </div>
 
     </div>
@@ -156,7 +166,7 @@
 
 <div class="flex justify-center items-center gap-4 mt-10">
     {% if page_obj.has_previous %}
-    <a href="?page={{page_ob.previous_page_number}}"
+    <a href="?page={{page_obj.previous_page_number}}"
        class="px-4 py-2 bg-white border rounded-lg shadow-sm hover:bg-cyan-600 hover:text-white transition">
         ← Previous
     </a>
