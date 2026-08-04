@@ -358,13 +358,7 @@ def checkout(request):
     # Get cart_id for user
     curr.execute("select cart_id from store_cart where user_id=%s", (user_id,))
     cart_row = curr.fetchone()
-    if not cart_row:
-        # Create cart if none exists
-        curr.execute("insert into store_cart(user_id) values(%s) returning cart_id", (user_id,))
-        cart_id = curr.fetchone()["cart_id"]
-        conn.commit()
-    else:
-        cart_id = cart_row["cart_id"]
+    cart_id = cart_row["cart_id"]
 
     # Get items in cart
     curr.execute("""select ci.cart_item_id, ci.product_id, ci.quantity, p.name, p.price, p.image_url, p.stock, p.description 
@@ -396,13 +390,16 @@ def checkout(request):
         "discount": discount
     })
     
-def checkout(request):
-    user_id=request.session["user_id"]
+# def checkout(request):
+#     user_id=request.session["user_id"]
     
-    conn=connect()
-    curr=conn.cursor()
-    curr.execute("select * from ")
-    order_info=
+#     conn=connect()
+#     curr=conn.cursor()
+#     curr.execute("select * from ")
+#     order_info=
+    
+    
+    
 def aboutus(request):
     return render(request, "aboutus.html")
 
