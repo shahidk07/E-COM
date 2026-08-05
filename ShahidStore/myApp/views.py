@@ -8,7 +8,8 @@ from django.core.mail import send_mail
 from django.core.paginator import Paginator
 import psycopg2
 import random
-
+from django.http import JsonResponse
+import json
 # Create your views here.
 
 def home(request):
@@ -119,21 +120,29 @@ def signup(request):
         last_name=request.POST.get("last_name")
         password=request.POST.get("password")
 
-        
-        otp=random.randint(100000,999999)
-        send_mail("Shahid Store OTP Verification",
-              f"Your OTP is {otp}", "viperoflegendkiller@gmail.com",
-        [email],
-        fail_silently=False,)
-
-        request.session["otp"]=str(otp)
-        request.session["email"]=email
-        request.session["first_name"]=first_name
-        request.session["last_name"]=last_name
-        request.session["password"]=password
-
-        return redirect('/verify/')
+        conn=connect()
+        curr=conn.cursor()
+        curr.execute(""" select email from storeusers where email=%s""",(email,))
+        store_email=curr.fetchone()
+        conn.close()
+        curr.close()
+        if(not store_email):
+            otp=random.randint(100000,999999)
+            send_mail("Shahid Store OTP Verification",
+                  f"Your OTP is {otp}", "viperoflegendkiller@gmail.com",
+            [email],
+            fail_silently=False,)
     
+            request.session["otp"]=str(otp)
+            request.session["email"]=email
+            request.session["first_name"]=first_name
+            request.session["last_name"]=last_name
+            request.session["password"]=password
+
+            return redirect('/verify/')
+        else:
+            return JsonResponse( {"message": "Email already registered."}, status=409
+)  
     return render(request,'signup.html')
 
 def verify(request):
@@ -159,16 +168,23 @@ def create_account(request):
     try:
         curr=conn.cursor()
         #create user and get user_id
-        curr.execute("""INSERT INTO storeusers(first_name,last_name,email,password)
-          VALUES(%s,%s,%s,%s) RETURNING user_id;
-        """,(first_name,last_name,email,password))
-   
+        try:
+            curr.execute("""INSERT INTO storeusers(first_name,last_name,email,password)
+              VALUES(%s,%s,%s,%s) RETURNING user_id;
+            """,(first_name,last_name,email,password))
+        except Exception as e:
+            conn.rollback()
+            return render(request,signup,{
+                "message":str(e)
+            })
+          
+            
         user_id=curr.fetchone()[0]
 
         #create a new cart for new user
         curr.execute("""
-                INSERT INTO store_cart(user_id)
-                VALUES (%s);""", (user_id,))
+                INSERT INTO store_cart(user_id,demo)
+                VALUES (%s,%s);""", (user_id,True))
             
         conn.commit()
 
@@ -224,8 +240,7 @@ def cart(request):
 
 
 def add_to_cart(request):
-    from django.http import JsonResponse
-    import json
+    
     is_authenticated=request.session.get("is_authenticated",False)
     if(is_authenticated):
         user_id=request.session["user_id"]
@@ -270,8 +285,6 @@ def add_to_cart(request):
 
 
 def update_cart(request):
-    from django.http import JsonResponse
-    import json
     data=json.loads(request.body)
     action=data["action"]
     cart_item_id=data["cart_item_id"]
@@ -314,8 +327,6 @@ def update_cart(request):
     return JsonResponse({"quantity":quantity,"item_total":str(item_total),"subtotal":str(subtotal),"total":str(total),"stock":stock})
 
 def remove_from_cart(request):
-    from django.http import JsonResponse
-    import json
     data=json.loads(request.body)
     cart_item_id=data["cart_item_id"]
     conn=connect()
@@ -356,8 +367,9 @@ def checkout(request):
     curr = conn.cursor(cursor_factory=RealDictCursor)
     
     # Get cart_id for user
-    curr.execute("select cart_id from store_cart where user_id=%s", (user_id,))
-    cart_row = curr.fetchone()
+    curr.execute("select cart_id,demo from store_cart where user_id=%s", (user_id,))
+    cart_row = curr.fetchone()[0]
+    demo=curr.fetchone()[1]
     cart_id = cart_row["cart_id"]
 
     # Get items in cart
@@ -385,6 +397,7 @@ def checkout(request):
     
     return render(request, "checkout.html", {
         "items": items,
+        "demo":demo,
         "subtotal": subtotal,
         "total": total,
         "discount": discount

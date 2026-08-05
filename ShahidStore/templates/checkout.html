@@ -470,7 +470,7 @@
 
                     <div class="flex justify-between text-sm">
                         <span class="text-gray-600">Discount</span>
-                        <span class="font-semibold text-rose-500">- ₹{{ discount|default:"0" }}</span>
+                        <span class="font-semibold text-rose-500">- ₹{{ demo|default:true }}</span>
                     </div>
 
                 </div>
@@ -585,6 +585,7 @@
 
 <script>
 // Form validation & order placement
+document.
 document.querySelectorAll('#place-order-btn, #place-order-btn-desktop').forEach(btn => {
     btn.addEventListener('click', async () => {
         const form = document.getElementById('checkout-form');

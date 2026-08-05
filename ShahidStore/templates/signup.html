@@ -62,7 +62,7 @@ button:active {background-color:dodgerblue
         <source src="{% static 'videos/login.mp4' %}" type="video/mp4">
         Your browser does not support the video tag.
     </video>
-    <form action="/signup/" method="post" name="form">
+    <form id="form" action="/signup/" method="post" name="form">
          {% csrf_token %}
         <h2>CREATE AN ACCOUNT</h2>
         <div class="form-group">
@@ -80,8 +80,54 @@ button:active {background-color:dodgerblue
 
         <p><input type="checkbox"> Remember me </p>
         <button type="submit" id="submit">Send OTP</button>
+
+        <p id="errorMessage" style="color:#ff6b6b; display:none;"></p>
+        
         <p>Already Registered?<a href='/signin/'>Login</a></p>
     </form>
+<script>
+const form = document.getElementById("form");
+const errorMessage = document.getElementById("errorMessage");
+form.addEventListener("submit", async (e) => {
 
+    e.preventDefault();
+
+    errorMessage.style.display = "none";
+
+    const formData = new FormData(form);
+
+    try {
+
+        const response = await fetch("/signup/", {
+            method: "POST",
+            body: formData
+        });
+
+        if (response.status === 409) {
+
+            const data = await response.json();
+
+            errorMessage.textContent = data.message;
+            errorMessage.style.display = "block";
+
+            return;
+        }
+
+        // OTP sent successfully
+        if (response.redirected) {
+            window.location.href = response.url;
+        }
+
+    }
+
+    catch (error) {
+
+        errorMessage.textContent = "Could not connect to the server.";
+        errorMessage.style.display = "block";
+
+    }
+
+});
+</script>
 </body>
 </html>
