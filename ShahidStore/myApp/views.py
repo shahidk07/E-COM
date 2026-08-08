@@ -1,15 +1,14 @@
-from decimal import Decimal
-
-from django.http import HttpResponse
-from django.shortcuts import redirect, render
-from requests import request
-from .models import Product
-from django.core.mail import send_mail
-from django.core.paginator import Paginator
+import json
 import psycopg2
 import random
+from decimal import Decimal
+from django.core.mail import send_mail
+from django.core.paginator import Paginator
 from django.http import JsonResponse
-import json
+from django.shortcuts import redirect, render
+from .models import Product
+
+
 # Create your views here.
 
 def home(request):
@@ -78,7 +77,6 @@ def details(request,id):
     product=Product.objects.get(id=id)
     return render(request,'prod_details.html',{"product":product})
 
-# def cart(request):
     
 def connect():
     conn=psycopg2.connect(
@@ -172,9 +170,10 @@ def create_account(request):
             curr.execute("""INSERT INTO storeusers(first_name,last_name,email,password)
               VALUES(%s,%s,%s,%s) RETURNING user_id;
             """,(first_name,last_name,email,password))
+            
         except Exception as e:
             conn.rollback()
-            return render(request,signup,{
+            return render(request,"signup.html",{
                 "message":str(e)
             })
           
@@ -182,9 +181,18 @@ def create_account(request):
         user_id=curr.fetchone()[0]
 
         #create a new cart for new user
+        curr.execute("select coupon_id from store_coupon where code=%s and is_active=True"
+                     ,("FREE100",))
+        coupon_row = curr.fetchone()
+
+        if coupon_row is None:
+            raise Exception("FREE100 coupon does not exist or is inactive")
+
+        coupon_id = coupon_row[0]
+        
         curr.execute("""
-                INSERT INTO store_cart(user_id,demo)
-                VALUES (%s,%s);""", (user_id,True))
+                INSERT INTO store_cart(user_id,applied_coupon_id)
+                VALUES (%s,%s);""", (user_id,coupon_id))
             
         conn.commit()
 
@@ -210,7 +218,99 @@ def create_account(request):
 
     
 
+def get_cart_summary(cart_id, curr):
 
+    # Get cart items
+    curr.execute("""
+        SELECT
+            ci.cart_item_id,
+            ci.product_id,
+            ci.quantity,
+            p.name,
+            p.price,
+            p.image_url,
+            p.stock,
+            p.description
+        FROM store_cart_item AS ci
+        JOIN "myApp_product" AS p
+            ON ci.product_id = p.id
+        WHERE ci.cart_id = %s
+    """, (cart_id,))
+
+    items = curr.fetchall()
+
+    # Calculate subtotal
+    subtotal = Decimal("0.00")
+
+    for item in items:
+        item["total_price"] = item["price"] * item["quantity"]
+        subtotal += item["total_price"]
+
+    # Get currently applied coupon
+    curr.execute("""
+        SELECT
+            c.applied_coupon_id,
+            cp.code,
+            cp.discount_type,
+            cp.discount_value,
+            cp.minimum_order,
+            cp.maximum_discount
+        FROM store_cart AS c
+        LEFT JOIN store_coupon AS cp
+            ON c.applied_coupon_id = cp.coupon_id
+        WHERE c.cart_id = %s
+    """, (cart_id,))
+
+    cart = curr.fetchone()
+
+    coupon = None
+    discount = Decimal("0.00")
+
+    if cart["applied_coupon_id"] is not None:
+
+        coupon = cart
+
+        # Check minimum order
+        if subtotal >= coupon["minimum_order"]:
+
+            if coupon["discount_type"] == "percentage":
+
+                discount = (
+                    subtotal *
+                    coupon["discount_value"] /
+                    Decimal("100")
+                )
+
+                # Apply maximum discount
+                if coupon["maximum_discount"] is not None:
+                    discount = min(
+                        discount,
+                        coupon["maximum_discount"]
+                    )
+
+            elif coupon["discount_type"] == "fixed":
+
+                discount = min(
+                    coupon["discount_value"],
+                    subtotal
+                )
+
+            elif coupon["discount_type"] == "final_price":
+
+                discount = max(
+                    subtotal - coupon["discount_value"],
+                    Decimal("0.00")
+                )
+
+    total = subtotal - discount
+
+    return {
+        "items": items,
+        "coupon": coupon,
+        "subtotal": subtotal,
+        "discount": discount,
+        "total": total
+    }
     
 def cart(request):
     from psycopg2.extras import RealDictCursor
@@ -218,24 +318,21 @@ def cart(request):
     user_id=request.session["user_id"]
     conn=connect()
     curr=conn.cursor(cursor_factory=RealDictCursor)
-    curr.execute("""select cart_id from store_cart where user_id=%s""",(user_id,))
-    cart_id=curr.fetchone()["cart_id"]
-
-    curr.execute("""select ci.cart_item_id,ci.product_id,ci.quantity,p.name,p.price,p.image_url,p.stock,p.description 
-        from store_cart_item as ci 
-        join "myApp_product" as p 
-        on ci.product_id=p.id
-        where ci.cart_id=%s""",(cart_id,))
     
-    items=curr.fetchall()
-
-    subtotal=Decimal("0.00")
-    for item in items:
-        item["total_price"]=item["price"]*item["quantity"]
-        subtotal+=item["total_price"]
-
-    total = subtotal  # shipping is free
-    return  render(request,"cart_page.html",{"items":items,"subtotal":subtotal,"total":total})
+    #Get cart and currently applied coupon
+    curr.execute("""select cart_id ,applied_coupon_id from store_cart
+                 where user_id=%s""",(user_id,))
+    cart=curr.fetchone()
+    cart_id = cart["cart_id"]
+    
+    # Calculate cart
+    summary = get_cart_summary(cart_id, curr)
+    curr.close()
+    conn.close()
+    
+    
+    return render(request,"cart_page.html",
+                   summary)
 
 
 
@@ -368,10 +465,12 @@ def checkout(request):
     
     # Get cart_id for user
     curr.execute("select cart_id,demo from store_cart where user_id=%s", (user_id,))
-    cart_row = curr.fetchone()[0]
-    demo=curr.fetchone()[1]
-    cart_id = cart_row["cart_id"]
+    
+    cart_row = curr.fetchone()
 
+    cart_id = cart_row["cart_id"]
+    demo = cart_row["demo"]
+    
     # Get items in cart
     curr.execute("""select ci.cart_item_id, ci.product_id, ci.quantity, p.name, p.price, p.image_url, p.stock, p.description 
         from store_cart_item as ci 
@@ -381,15 +480,16 @@ def checkout(request):
     items = curr.fetchall()
 
     subtotal = Decimal("0.00")
+
     for item in items:
         item["total_price"] = item["price"] * item["quantity"]
         subtotal += item["total_price"]
 
     discount = Decimal("0.00")
-    if subtotal > 0:
-        # Apply a default coupon discount if needed or leave it as 0 / default
-        pass
-        
+
+    if demo:
+        discount = subtotal
+
     total = subtotal - discount
 
     curr.close()
@@ -403,15 +503,7 @@ def checkout(request):
         "discount": discount
     })
     
-# def checkout(request):
-#     user_id=request.session["user_id"]
-    
-#     conn=connect()
-#     curr=conn.cursor()
-#     curr.execute("select * from ")
-#     order_info=
-    
-    
+
     
 def aboutus(request):
     return render(request, "aboutus.html")

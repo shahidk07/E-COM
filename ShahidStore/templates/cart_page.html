@@ -457,31 +457,7 @@ async function removeFunc(item,cart_item_id){
 
     }
 
-    //apply discount
-    const demo={{demo|yesno:"true,false"}};
-    let couponApplied=demo;
 
-    //set default coupon code;
-    if(couponApplied){
-        document.getElementById("couponInput").value="DEMO";
-         document.getElementById("applyCoupon").textContent = "Remove";
-    }
-    function applyCoupon(){
-         if (!demo) {
-        alert("Invalid coupon");
-        return;
-    }
-
-        const button = document.getElementById("applyCoupon");
-        button.disable=true;
-        button.textContent="Applied";
-
-        if(demo){
-            document.getElementById('total').innerText="₹ 0";
-            total=0;
-        }
-    }
-    
     
 </script>
 </body>
