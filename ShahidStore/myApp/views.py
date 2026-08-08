@@ -316,6 +316,11 @@ def cart(request):
     from psycopg2.extras import RealDictCursor
 
     user_id=request.session["user_id"]
+    if not user_id:
+            return JsonResponse(
+                {"success": False, "message": "Please login first"},
+                status=401)
+            
     conn=connect()
     curr=conn.cursor(cursor_factory=RealDictCursor)
     
@@ -335,6 +340,215 @@ def cart(request):
                    summary)
 
 
+def apply_coupon(request):
+
+    if request.method != "POST":
+        return JsonResponse(
+            {"success": False, "message": "Invalid request method"},
+            status=405
+        )
+
+    user_id = request.session.get("user_id")
+
+    if not user_id:
+        return JsonResponse(
+            {"success": False, "message": "Please login first"},
+            status=401
+        )
+
+    code = request.POST.get("code", "").strip().upper()
+
+    if not code:
+        return JsonResponse(
+            {"success": False, "message": "Enter a coupon code"},
+            status=400
+        )
+
+    conn = connect()
+    from psycopg2.extras import RealDictCursor
+    curr = conn.cursor(cursor_factory=RealDictCursor)
+
+    try:
+        # Get user's cart
+        curr.execute("""
+            SELECT cart_id
+            FROM store_cart
+            WHERE user_id = %s
+        """, (user_id,))
+
+        cart = curr.fetchone()
+
+        if cart is None:
+            return JsonResponse(
+                {"success": False, "message": "Cart not found"},
+                status=404
+            )
+
+        cart_id = cart["cart_id"]
+
+        # Find coupon
+        curr.execute("""
+            SELECT
+                coupon_id,
+                code,
+                discount_type,
+                discount_value,
+                minimum_order,
+                maximum_discount,
+                is_active,
+                expires_at
+            FROM store_coupon
+            WHERE code = %s
+        """, (code,))
+
+        coupon = curr.fetchone()
+
+        # Coupon doesn't exist
+        if coupon is None:
+            return JsonResponse(
+                {"success": False, "message": "Invalid coupon"},
+                status=400
+            )
+
+        # Coupon is disabled
+        if not coupon["is_active"]:
+            return JsonResponse(
+                {"success": False, "message": "Coupon is inactive"},
+                status=400
+            )
+
+        # Check expiry
+        if coupon["expires_at"] is not None:
+            from datetime import datetime, timezone
+
+            if coupon["expires_at"] <= datetime.now(timezone.utc):
+                return JsonResponse(
+                    {"success": False, "message": "Coupon has expired"},
+                    status=400
+                )
+
+        # Get current cart summary
+        summary = get_cart_summary(cart_id, curr)
+
+        subtotal = summary["subtotal"]
+
+        # Check minimum order
+        if subtotal < coupon["minimum_order"]:
+            return JsonResponse(
+                {
+                    "success": False,
+                    "message": (
+                        f"Minimum order value is "
+                        f"₹{coupon['minimum_order']}"
+                    )
+                },
+                status=400
+            )
+
+        # Apply coupon
+        curr.execute("""
+            UPDATE store_cart
+            SET applied_coupon_id = %s
+            WHERE cart_id = %s
+        """, (coupon["coupon_id"], cart_id))
+
+        conn.commit()
+
+        # Recalculate using the newly applied coupon
+        summary = get_cart_summary(cart_id, curr)
+
+        return JsonResponse({
+            "success": True,
+            "message": "Coupon applied successfully",
+            "code": coupon["code"],
+            "discount": str(summary["discount"]),
+            "total": str(summary["total"])
+        })
+
+    except Exception:
+        conn.rollback()
+        raise
+
+    finally:
+        curr.close()
+        conn.close()
+        
+def remove_coupon(request):
+
+    if request.method != "POST":
+        return JsonResponse(
+            {
+                "success": False,
+                "message": "Invalid request method"
+            },
+            status=405
+        )
+
+    user_id = request.session.get("user_id")
+
+    if not user_id:
+        return JsonResponse(
+            {
+                "success": False,
+                "message": "Please login first"
+            },
+            status=401
+        )
+
+    conn = connect()
+    from psycopg2.extras import RealDictCursor
+    curr = conn.cursor(cursor_factory=RealDictCursor)
+
+    try:
+        # Get user's cart
+        curr.execute("""
+            SELECT cart_id
+            FROM store_cart
+            WHERE user_id = %s
+        """, (user_id,))
+
+        cart = curr.fetchone()
+
+        if cart is None:
+            return JsonResponse(
+                {
+                    "success": False,
+                    "message": "Cart not found"
+                },
+                status=404
+            )
+
+        cart_id = cart["cart_id"]
+
+        # Remove applied coupon
+        curr.execute("""
+            UPDATE store_cart
+            SET applied_coupon_id = NULL
+            WHERE cart_id = %s
+        """, (cart_id,))
+
+        conn.commit()
+
+        # Recalculate cart after removing coupon
+        summary = get_cart_summary(cart_id, curr)
+
+        return JsonResponse({
+            "success": True,
+            "message": "Coupon removed",
+            "discount": str(summary["discount"]),
+            "total": str(summary["total"])
+        })
+
+    except Exception:
+        conn.rollback()
+        raise
+
+    finally:
+        curr.close()
+        conn.close()
+
+
+        
 
 def add_to_cart(request):
     
