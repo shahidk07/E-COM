@@ -356,14 +356,6 @@ def apply_coupon(request):
             status=401
         )
 
-    code = request.POST.get("code", "").strip().upper()
-
-    if not code:
-        return JsonResponse(
-            {"success": False, "message": "Enter a coupon code"},
-            status=400
-        )
-
     conn = connect()
     from psycopg2.extras import RealDictCursor
     curr = conn.cursor(cursor_factory=RealDictCursor)
@@ -385,8 +377,19 @@ def apply_coupon(request):
             )
 
         cart_id = cart["cart_id"]
+         
+        # getting The applied coupon from client
+        data = json.loads(request.body)
 
-        # Find coupon
+        code = data.get("code", "").strip().upper()
+
+        if not code:
+            return JsonResponse(
+            {"success": False, "message": "Enter a coupon code"},
+            status=400
+        )
+
+        # Find  that coupon in the database
         curr.execute("""
             SELECT
                 coupon_id,
@@ -549,7 +552,9 @@ def remove_coupon(request):
 
 
         
-
+################################
+######### ADD TO CART ##########
+################################
 def add_to_cart(request):
     
     is_authenticated=request.session.get("is_authenticated",False)
@@ -594,7 +599,9 @@ def add_to_cart(request):
         return JsonResponse({"message":"Please signin again"},status=401)
 
 
-
+################################
+######### UPDATE CART ##########
+################################
 def update_cart(request):
     data=json.loads(request.body)
     action=data["action"]
@@ -637,6 +644,10 @@ def update_cart(request):
     conn.close()
     return JsonResponse({"quantity":quantity,"item_total":str(item_total),"subtotal":str(subtotal),"total":str(total),"stock":stock})
 
+
+################################
+###### REMOVE FROM CART ########
+################################
 def remove_from_cart(request):
     data=json.loads(request.body)
     cart_item_id=data["cart_item_id"]
@@ -663,10 +674,6 @@ def remove_from_cart(request):
     conn.close()
     return JsonResponse({"subtotal":str(subtotal),"total":str(total)})
 
-
-def logout(request):
-    request.session.flush()
-    return redirect("/signin/")
 
 def checkout(request):
     from psycopg2.extras import RealDictCursor
@@ -717,8 +724,16 @@ def checkout(request):
         "discount": discount
     })
     
-
     
+################################
+############ LOGOUT ############
+################################
+
+def logout(request):
+    request.session.flush()
+    return redirect("/signin/")
+
+ 
 def aboutus(request):
     return render(request, "aboutus.html")
 

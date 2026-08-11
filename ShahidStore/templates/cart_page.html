@@ -1,6 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,453 +13,594 @@
 
 <body class="bg-slate-50">
 
-<main class="max-w-7xl mx-auto px-6 py-10">
+    <main class="max-w-7xl mx-auto px-6 py-10">
 
-    <!-- Page title -->
-    <div class="mb-6">
-        <h1 class="text-3xl font-bold text-slate-900">
-            Shopping Cart
-        </h1>
+        <!-- Page title -->
+        <div class="mb-6">
+            <h1 class="text-3xl font-bold text-slate-900">
+                Shopping Cart
+            </h1>
 
-        <p class="text-gray-500 mt-2">
-            Home &gt; Cart
-        </p>
-    </div>
-
-
-    <div class="grid lg:grid-cols-3 gap-7">
-
-        <!-- ============================= -->
-        <!-- LEFT SIDE - CART ITEMS -->
-        <!-- ============================= -->
-
-        <section class="lg:col-span-2">
-
-            <!-- Item count -->
-            <div class="bg-cyan-50 rounded-xl px-5 py-4 mb-5 flex items-center gap-3">
-                <span class="text-xl">🛒</span>
-
-                <p>
-                    You have
-                    <strong id="item-count">{{ items|length }} item(s)</strong>
-                    in your cart
-                </p>
-            </div>
+            <p class="text-gray-500 mt-2">
+                Home &gt; Cart
+            </p>
+        </div>
 
 
-            <!-- Cart items container -->
-            <div class="bg-white border rounded-2xl px-6">
+        <div class="grid lg:grid-cols-3 gap-7">
 
-                {% for item in items %}
+            <!-- ============================= -->
+            <!-- LEFT SIDE - CART ITEMS -->
+            <!-- ============================= -->
 
-                <div data-cart-item-id="{{item.cart_item_id}}" data-stock="{{ item.stock }}" class="cart-item py-6 flex gap-6 border-b last:border-b-0" >
+            <section class="lg:col-span-2">
 
-                    <!-- Product Image -->
-                    <div class="w-44 h-44 flex-shrink-0 bg-gray-100 rounded-xl overflow-hidden">
+                <!-- Item count -->
+                <div class="bg-cyan-50 rounded-xl px-5 py-4 mb-5 flex items-center gap-3">
+                    <span class="text-xl">🛒</span>
 
-                        <img
-                            src="{{ item.image_url }}"
-                            alt="{{ item.name }}"
-                            class="w-full h-full object-cover"
-                        >
+                    <p>
+                        You have
+                        <strong id="item-count">{{ items|length }} item(s)</strong>
+                        in your cart
+                    </p>
+                </div>
 
-                    </div>
+
+                <!-- Cart items container -->
+                <div class="bg-white border rounded-2xl px-6">
+
+                    {% for item in items %}
+
+                    <div data-cart-item-id="{{item.cart_item_id}}" data-stock="{{ item.stock }}"
+                        class="cart-item py-6 flex gap-6 border-b last:border-b-0">
+
+                        <!-- Product Image -->
+                        <div class="w-44 h-44 flex-shrink-0 bg-gray-100 rounded-xl overflow-hidden">
+
+                            <img src="{{ item.image_url }}" alt="{{ item.name }}" class="w-full h-full object-cover">
+
+                        </div>
 
 
-                    <!-- Product information -->
-                    <div class="flex-1">
+                        <!-- Product information -->
+                        <div class="flex-1">
 
-                        <!-- Category -->
-                        <span class="inline-block bg-cyan-50 text-cyan-600
+                            <!-- Category -->
+                            <span class="inline-block bg-cyan-50 text-cyan-600
                                      text-xs px-3 py-1 rounded-lg">
 
-                            {{ item.category }}
+                                {{ item.category }}
 
-                        </span>
-
-
-                        <!-- Name -->
-                        <h2 class="text-xl font-semibold mt-4">
-                            {{ item.name }}
-                        </h2>
+                            </span>
 
 
-                        <!-- Description -->
-                        <p class="text-gray-500 mt-2">
-                            {{ item.description|truncatechars:70 }}
-                        </p>
+                            <!-- Name -->
+                            <h2 class="text-xl font-semibold mt-4">
+                                {{ item.name }}
+                            </h2>
 
 
-                        <!-- Price -->
-                        <p class="font-bold text-xl mt-5">
-                            ₹{{ item.price }}
-                        </p>
-
-                    </div>
-
-
-                    <!-- Quantity / Total -->
-                    <div class="w-48 flex flex-col justify-between">
-
-                        <div>
-
-                            <p class="font-medium mb-3">
-                                Quantity
+                            <!-- Description -->
+                            <p class="text-gray-500 mt-2">
+                                {{ item.description|truncatechars:70 }}
                             </p>
 
-                            <div class="inline-flex border rounded-lg overflow-hidden">
 
-                                <button
-                                     class="minusBtn w-12 h-11 hover:bg-gray-100">
-                                    −
-                                </button>
+                            <!-- Price -->
+                            <p class="font-bold text-xl mt-5">
+                                ₹{{ item.price }}
+                            </p>
 
-                                <span
-                                    class="quantity w-12 h-11 flex items-center justify-center">
-                                    {{ item.quantity }}
-                                </span>
+                        </div>
 
-                                <button
-                                    class="plusBtn w-12 h-11 hover:bg-gray-100" >
-                                    +
+
+                        <!-- Quantity / Total -->
+                        <div class="w-48 flex flex-col justify-between">
+
+                            <div>
+
+                                <p class="font-medium mb-3">
+                                    Quantity
+                                </p>
+
+                                <div class="inline-flex border rounded-lg overflow-hidden">
+
+                                    <button class="minusBtn w-12 h-11 hover:bg-gray-100">
+                                        −
+                                    </button>
+
+                                    <span class="quantity w-12 h-11 flex items-center justify-center">
+                                        {{ item.quantity }}
+                                    </span>
+
+                                    <button class="plusBtn w-12 h-11 hover:bg-gray-100">
+                                        +
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="text-right">
+
+                                <!-- Later calculate price × quantity -->
+                                <p class="item-total font-bold text-xl mb-4">
+                                    ₹{{ item.total_price }}
+                                </p>
+
+                                <button class=" removeBtn text-red-500 hover:text-red-600">
+                                    🗑 Remove
                                 </button>
 
                             </div>
 
                         </div>
 
+                    </div>
 
-                        <div class="text-right">
+                    {% empty %}
 
-                            <!-- Later calculate price × quantity -->
-                            <p class="item-total font-bold text-xl mb-4">
-                                ₹{{ item.total_price }}
-                            </p>
+                    <div class="py-16 text-center">
 
-                            <button
-                                class=" removeBtn text-red-500 hover:text-red-600">
-                                🗑 Remove
+                        <p class="text-xl font-semibold">
+                            Your cart is empty
+                        </p>
+
+                        <p class="text-gray-500 mt-2">
+                            Add some products to get started.
+                        </p>
+
+                    </div>
+
+                    {% endfor %}
+
+                </div>
+
+
+                <!-- Continue Shopping -->
+                <a href="/catalog/" class="inline-flex mt-4 px-5 py-3 bg-white border
+                       rounded-lg hover:bg-gray-50">
+
+                    ← &nbsp; Continue Shopping
+
+                </a>
+
+            </section>
+
+
+
+            <!-- ============================= -->
+            <!-- RIGHT SIDE - ORDER SUMMARY -->
+            <!-- ============================= -->
+
+            <aside>
+
+                <div class="bg-white border rounded-2xl p-6 sticky top-6">
+
+                    <h2 class="text-2xl font-bold mb-6">
+                        Order Summary
+                    </h2>
+
+
+                    <!-- Items -->
+                    <div class="flex justify-between pb-5 border-b">
+
+                        <span>
+                            Items ({{ items|length }})
+                        </span>
+
+                        <span class="subtotal font-medium">
+                            ₹{{ subtotal }}
+                        </span>
+
+                    </div>
+
+
+                    <!-- Subtotal -->
+                    <div class="flex justify-between mt-5">
+
+                        <span>
+                            Subtotal
+                        </span>
+
+                        <span id="subtotal" class="font-medium">
+                            ₹{{ subtotal }}
+                        </span>
+
+                    </div>
+
+
+                    <!-- Shipping -->
+                    <div class="flex justify-between mt-4">
+
+                        <span>
+                            Shipping
+                        </span>
+
+                        <span class="text-green-600 font-medium">
+                            Free
+                        </span>
+
+                    </div>
+
+                    <!-- Discount -->
+                    <div class="flex justify-between mt-4">
+
+                        <span>
+                            Discount
+                        </span>
+
+                        <span id="discount" class="text-rose-500 font-medium">
+                            - ₹{{ discount }}
+                        </span>
+
+                    </div>
+
+                    <!-- ================= -->
+                    <!-- COUPON -->
+                    <!-- ================= -->
+
+                    <div class="border-t border-b mt-6 py-5">
+
+                        <p class="font-medium mb-4">
+                            🏷 Coupon / Offer
+                        </p>
+
+                        <div class="flex gap-2">
+
+                            <input id="couponInput" type="text" placeholder="Enter coupon code" class="flex-1 min-w-0 border rounded-lg
+                   px-4 py-3 outline-none
+                   focus:border-cyan-500">
+
+                            <button id="toggleCoupon" type="button"
+                                class="bg-cyan-600 text-white px-5 rounded-lg hover:bg-cyan-700">
+                                Apply
                             </button>
 
                         </div>
 
-                    </div>
-
-                </div>
-
-                {% empty %}
-
-                <div class="py-16 text-center">
-
-                    <p class="text-xl font-semibold">
-                        Your cart is empty
-                    </p>
-
-                    <p class="text-gray-500 mt-2">
-                        Add some products to get started.
-                    </p>
-
-                </div>
-
-                {% endfor %}
-
-            </div>
-
-
-            <!-- Continue Shopping -->
-            <a
-                href="/catalog/"
-                class="inline-flex mt-4 px-5 py-3 bg-white border
-                       rounded-lg hover:bg-gray-50">
-
-                ← &nbsp; Continue Shopping
-
-            </a>
-
-        </section>
-
-
-
-        <!-- ============================= -->
-        <!-- RIGHT SIDE - ORDER SUMMARY -->
-        <!-- ============================= -->
-
-        <aside>
-
-            <div class="bg-white border rounded-2xl p-6 sticky top-6">
-
-                <h2 class="text-2xl font-bold mb-6">
-                    Order Summary
-                </h2>
-
-
-                <!-- Items -->
-                <div class="flex justify-between pb-5 border-b">
-
-                    <span>
-                        Items ({{ items|length }})
-                    </span>
-
-                    <span class="subtotal font-medium">
-                        ₹{{ subtotal }}
-                    </span>
-
-                </div>
-
-
-                <!-- Subtotal -->
-                <div  class="flex justify-between mt-5">
-
-                    <span>
-                        Subtotal
-                    </span>
-
-                    <span id="subtotal" class="font-medium">
-                        ₹{{ subtotal }}
-                    </span>
-
-                </div>
-
-
-                <!-- Shipping -->
-                <div class="flex justify-between mt-4">
-
-                    <span>
-                        Shipping
-                    </span>
-
-                    <span class="text-green-600 font-medium">
-                        Free
-                    </span>
-
-                </div>
-
-
-                <!-- ================= -->
-                <!-- COUPON -->
-                <!-- ================= -->
-
-                <div class="border-t border-b mt-6 py-5">
-
-                    <p class="font-medium mb-4">
-                        🏷 Coupon / Offer
-                    </p>
-
-
-                    <div class="flex gap-2">
-
-                        <input
-                            id="couponInput"
-                            type="text"
-                            placeholder="Enter coupon code"
-                            class="flex-1 min-w-0 border rounded-lg
-                                   px-4 py-3 outline-none
-                                   focus:border-cyan-500"
-                        >
-
-                        <button
-                            id="applyCoupon"
-                            class="bg-cyan-600 text-white
-                                   px-5 rounded-lg
-                                   hover:bg-cyan-700" onclick="applyCoupon()">
-
-                            Apply
-
-                        </button>
+                        <!-- Coupon success/error message -->
+                        <p id="couponMessage" class="text-sm mt-2 min-h-[20px]">
+                        </p>
 
                     </div>
 
-                </div>
+
+                    <!-- Total -->
+                    <div class="flex justify-between items-center mt-7">
+
+                        <span class="text-xl font-bold">
+                            Total
+                        </span>
+
+                        <span id="total" class=" text-3xl font-bold">
+                            ₹{{ total }}
+                        </span>
+
+                    </div>
 
 
-                <!-- Total -->
-                <div class="flex justify-between items-center mt-7">
-
-                    <span class="text-xl font-bold">
-                        Total
-                    </span>
-
-                    <span id="total" class=" text-3xl font-bold">
-                        ₹{{ total }}
-                    </span>
-
-                </div>
-
-
-                <!-- Checkout -->
-                <a href="/checkout/" class="block w-full">
-                    <button
-                        class="w-full bg-cyan-600 text-white
+                    <!-- Checkout -->
+                    <a href="/checkout/" class="block w-full">
+                        <button class="w-full bg-cyan-600 text-white
                                py-4 rounded-xl mt-6
                                font-medium
                                hover:bg-cyan-700">
 
-                        Proceed To Checkout
+                            Proceed To Checkout
 
-                    </button>
-                </a>
-
-
-                <p class="text-center text-gray-500 mt-4 text-sm">
-                    🔒 Secure Checkout
-                </p>
-
-            </div>
-
-        </aside>
-
-    </div>
+                        </button>
+                    </a>
 
 
-    <!-- ============================= -->
-    <!-- OFFER BOX -->
-    <!-- ============================= -->
+                    <p class="text-center text-gray-500 mt-4 text-sm">
+                        🔒 Secure Checkout
+                    </p>
 
-    <div class="mt-8 bg-cyan-50 border border-cyan-100
-                rounded-xl p-6
-                flex justify-between items-center">
+                </div>
 
-        <div class="flex gap-4">
-
-            <span class="text-2xl">
-                🏷
-            </span>
-
-            <div>
-
-                <p class="font-bold">
-                    MEGA1 - Get any 1 item for just ₹1
-                </p>
-
-                <p class="text-gray-600 mt-1">
-                    Add any 2 or more items to cart and apply
-                    MEGA1 coupon to get the lowest priced item for just ₹1.
-                </p>
-
-            </div>
+            </aside>
 
         </div>
 
-        <button
-            class="border border-cyan-600 text-cyan-600
+
+        <!-- ============================= -->
+        <!-- OFFER BOX -->
+        <!-- ============================= -->
+
+        <div class="mt-8 bg-cyan-50 border border-cyan-100
+                rounded-xl p-6
+                flex justify-between items-center">
+
+            <div class="flex gap-4">
+
+                <span class="text-2xl">
+                    🏷
+                </span>
+
+                <div>
+
+                    <p class="font-bold">
+                        MEGA1 - Get any 1 item for just ₹1
+                    </p>
+
+                    <p class="text-gray-600 mt-1">
+                        Add any 2 or more items to cart and apply
+                        MEGA1 coupon to get the lowest priced item for just ₹1.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <button class="border border-cyan-600 text-cyan-600
                    px-5 py-2 rounded-lg
                    hover:bg-cyan-600 hover:text-white">
 
-            View All Offers
+                View All Offers
 
-        </button>
+            </button>
 
-    </div>
+        </div>
 
-</main>
-<script>
-//product quantity handling
-document.querySelectorAll(".cart-item").forEach(item=>{
+    </main>
+    <script>
+        //product quantity handling
+        document.querySelectorAll(".cart-item").forEach(item => {
 
-    const cart_item_id = item.dataset.cartItemId;
-    let stock=Number(item.dataset.stock)
-    const quantityText=item.querySelector(".quantity");
-    const itemTotal = item.querySelector(".item-total");
-    let quantity=Number(quantityText.textContent);
+            const cart_item_id = item.dataset.cartItemId;
+            let stock = Number(item.dataset.stock)
+            const quantityText = item.querySelector(".quantity");
+            const itemTotal = item.querySelector(".item-total");
+            let quantity = Number(quantityText.textContent);
 
-     /////////////////////////////
-    ///////  Increase   /////////
-   /////////////////////////////    
-    item.querySelector(".plusBtn").addEventListener("click",async()=>{
-        if(stock>0){
-        const response=await fetch("/cart/update/",{
-            method:"POST",
-            headers:{
-                "Content-Type":"application/json",
-                "X-CSRFToken":"{{csrf_token}}"
-            },
-            body:JSON.stringify({
-                cart_item_id:cart_item_id,
-                action:"increase"
-        }
-            )
-        })
-        const data=await response.json();
-        if(response.ok){
-            quantity=data.quantity;
-            quantityText.textContent=data.quantity;
-            itemTotal.textContent=`₹${data.item_total}`;
-            document.getElementById("subtotal").textContent =`₹${data.subtotal}`;
-            document.getElementById("total").textContent =`₹${data.total}`;
-        }
-}});
+            /////////////////////////////
+            ///////  Increase   /////////
+            /////////////////////////////    
+            item.querySelector(".plusBtn").addEventListener("click", async () => {
+                if (stock > 0) {
+                    const response = await fetch("/cart/update/", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": "{{csrf_token}}"
+                        },
+                        body: JSON.stringify({
+                            cart_item_id: cart_item_id,
+                            action: "increase"
+                        }
+                        )
+                    })
+                    const data = await response.json();
+                    if (response.ok) {
+                        quantity = data.quantity;
+                        quantityText.textContent = data.quantity;
+                        itemTotal.textContent = `₹${data.item_total}`;
+                        document.getElementById("subtotal").textContent = `₹${data.subtotal}`;
+                        document.getElementById("total").textContent = `₹${data.total}`;
+                    }
+                }
+            });
 
-//////////////////////////////
-///////  Decrease    /////////
-/////////////////////////////    
-    item.querySelector(".minusBtn").addEventListener("click",async()=>{
-        if(quantity>1){
-        const response=await fetch("/cart/update/",{
-            method:"POST",
-            headers:{
-                "Content-Type":"application/json",
-                "X-CSRFToken":"{{csrf_token}}"
-            },
-            body:JSON.stringify({
-                cart_item_id:cart_item_id,
-                action:"decrease"
-        }
-            )
-        })
-        const data=await response.json();
-        if(response.ok){
-            quantity = data.quantity; 
-            stock=data.stock;
-            quantityText.textContent = data.quantity;
-            itemTotal.textContent = `₹${data.item_total}`;
-            document.getElementById("subtotal").textContent = `₹${data.subtotal}`;
-            document.getElementById("total").textContent = `₹${data.total}`;
-        }
-    }
-    else{
-     removeFunc(item,cart_item_id);
-    }
-    })
+            //////////////////////////////
+            ///////  Decrease    /////////
+            /////////////////////////////    
+            item.querySelector(".minusBtn").addEventListener("click", async () => {
+                if (quantity > 1) {
+                    const response = await fetch("/cart/update/", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": "{{csrf_token}}"
+                        },
+                        body: JSON.stringify({
+                            cart_item_id: cart_item_id,
+                            action: "decrease"
+                        }
+                        )
+                    })
+                    const data = await response.json();
+                    if (response.ok) {
+                        quantity = data.quantity;
+                        stock = data.stock;
+                        quantityText.textContent = data.quantity;
+                        itemTotal.textContent = `₹${data.item_total}`;
+                        document.getElementById("subtotal").textContent = `₹${data.subtotal}`;
+                        document.getElementById("total").textContent = `₹${data.total}`;
+                    }
+                }
+                else {
+                    removeFunc(item, cart_item_id);
+                }
+            })
 
-    item.querySelector(".removeBtn").addEventListener("click",()=>{
-        removeFunc(item,cart_item_id);
-    })
+            item.querySelector(".removeBtn").addEventListener("click", () => {
+                removeFunc(item, cart_item_id);
+            })
 
-});
+        });
 
-//remove items from dom
-async function removeFunc(item,cart_item_id){
-        const response=await fetch('/cart/remove/',{
-            method:"DELETE",
-            headers:{"Content-Type":"application/json",
-                "X-CSRFToken":"{{csrf_token}}"},
-            body:JSON.stringify({cart_item_id:cart_item_id})
-        })
-        const data=await response.json()
-        console.log(data);
-        if(response.ok){
-            item.remove();
-            document.getElementById("item-count").textContent = 
-            document.querySelectorAll(".cart-item").length + " item(s)";
-            document.getElementById("subtotal").textContent =`₹${data.subtotal}`;
-            document.getElementById("total").textContent =`₹${data.total}`;
+        //remove items from dom
+        async function removeFunc(item, cart_item_id) {
+            const response = await fetch('/cart/remove/', {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{csrf_token}}"
+                },
+                body: JSON.stringify({ cart_item_id: cart_item_id })
+            })
+            const data = await response.json()
+            console.log(data);
+            if (response.ok) {
+                item.remove();
+                document.getElementById("item-count").textContent =
+                    document.querySelectorAll(".cart-item").length + " item(s)";
+                document.getElementById("subtotal").textContent = `₹${data.subtotal}`;
+                document.getElementById("total").textContent = `₹${data.total}`;
 
-            
-            if (document.querySelectorAll(".cart-item").length === 0) {
-           document.querySelector(".bg-white.border.rounded-2xl.px-6").innerHTML = `
+
+                if (document.querySelectorAll(".cart-item").length === 0) {
+                    document.querySelector(".bg-white.border.rounded-2xl.px-6").innerHTML = `
         <div class="py-16 text-center">
             <p class="text-xl font-semibold">Your cart is empty</p>
             <p class="text-gray-500 mt-2">Add some products to get started.</p>
         </div>
     `;
-}
+                }
+            }
+
+
         }
 
 
-    }
+
+        /////////////////////////////
+        //////////COUPONS///////////
+        ///////////////////////////
+
+        let couponApplied=false;
+
+        document.getElementById("toggleCoupon").addEventListener("click",async ()=>{
+        if(couponApplied){
+         const removed=await removeCoupon();
+
+         if(removed){
+          couponApplied=false;
+         }
+        }
+
+        else{
+            const applied=await applyCoupon();
+            if(applied){
+                couponApplied=true;
+            }
+        }});
 
 
-    
-</script>
+        //apply coupon
+        async function applyCoupon() {
+            const couponInput = document.getElementById("couponInput")
+            const code = couponInput.value.toUpperCase();
+            var couponMessage = document.getElementById("couponMessage");
+
+            // No coupon entered
+            if (!code) {
+                couponMessage.textContent = "Enter a coupon code";
+                couponMessage.className = "text-red-500 text-sm mt-2";
+                return false;
+            }
+
+            try {
+
+                //send post request
+                const response = await fetch('/apply_coupon/', {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": "{{csrf_token}}",
+                    },
+                    body: JSON.stringify({ code: code })
+                })
+                const data = await response.json();
+                couponMessage.textContent = data.message;
+
+
+                //invalid coupon/expired
+                if (!response.ok) {
+                    couponMessage.className = "text-red-500 text-sm mt-2";
+                    couponInput.classList.add("border-red-500");
+                    return false;
+                }
+                //Coupon applied Successfully
+
+                //update discount
+                document.getElementById("discount").textContent = `- ₹${data.discount}`;
+                //update total
+
+                document.getElementById("total").textContent = `₹${data.total}`;
+                couponInput.classList.remove("border-red-500");
+                couponInput.classList.add("border-green-500");
+
+                couponMessage.className = "text-green-600 text-sm mt-2";
+
+                // Change Apply → Remove
+                document.getElementById("toggleCoupon").textContent = "Remove";
+                return true;
+            }
+
+            catch (error) {
+
+                console.error(error);
+
+                couponMessage.textContent = error.message;
+
+                couponMessage.className =
+                    "text-red-500 text-sm mt-2";
+                    return false;
+            }
+
+        }
+
+
+        ////////////////
+        ///////////////
+        ///////////////
+
+        //Remove coupon
+        async function removeCoupon() {
+            const couponInput = document.getElementById("couponInput");
+            const couponMessage = document.getElementById("couponMessage");
+            const toggleCoupon = document.getElementById("toggleCoupon");
+
+            couponInput.value = "";
+
+            document.getElementById("couponMessage").textContent = "";
+
+            try {
+
+                //send post request
+
+                const response = await fetch('/remove_coupon/', {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": "{{csrf_token}}",
+                    }
+                })
+                const data = await response.json();
+                couponMessage.textContent = data.message;
+
+                if (!data.success) {
+                    couponMessage.className =
+                        "text-red-500 text-sm mt-2";
+                    return false;
+                }
+
+                document.getElementById("total").textContent = `₹${data.total}`;
+                document.getElementById("discount").textContent =`- ₹${data.discount}`;
+                couponInput.classList.remove("border-red-500");
+                couponInput.classList.add("border-green-500");
+
+                // Change Remove → Apply
+                toggleCoupon.textContent = "Apply";
+                return true;
+
+            }
+            catch (error) {
+
+                console.error(error);
+
+                couponMessage.textContent = error.message;
+
+                couponMessage.className =
+                    "text-red-500 text-sm mt-2";
+                    return false;
+            }
+
+        }
+    </script>
 </body>
+
 </html>
