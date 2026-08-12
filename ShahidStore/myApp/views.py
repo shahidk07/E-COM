@@ -676,21 +676,42 @@ def remove_from_cart(request):
 
 
 def checkout(request):
-    from psycopg2.extras import RealDictCursor
+    
     user_id = request.session.get("user_id")
     if not user_id:
         return redirect("/signin/")
     
     conn = connect()
-    curr = conn.cursor(cursor_factory=RealDictCursor)
+    curr = conn.cursor()
     
     # Get cart_id for user
-    curr.execute("select cart_id,demo from store_cart where user_id=%s", (user_id,))
+    curr.execute("select cart_id from store_cart where user_id=%s", (user_id,))
     
-    cart_row = curr.fetchone()
+    cart_id = curr.fetchone()[0]
+   
+    
+    checkout_data=get_cart_summary(cart_id,curr)
 
-    cart_id = cart_row["cart_id"]
-    demo = cart_row["demo"]
+    
+    
+      return {
+            "items": items,
+            "coupon": coupon,
+            "subtotal": subtotal,
+            "discount": discount,
+            "total": total
+        }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     # Get items in cart
     curr.execute("""select ci.cart_item_id, ci.product_id, ci.quantity, p.name, p.price, p.image_url, p.stock, p.description 
@@ -700,28 +721,15 @@ def checkout(request):
         where ci.cart_id=%s""", (cart_id,))
     items = curr.fetchall()
 
-    subtotal = Decimal("0.00")
+     
 
-    for item in items:
-        item["total_price"] = item["price"] * item["quantity"]
-        subtotal += item["total_price"]
-
-    discount = Decimal("0.00")
-
-    if demo:
-        discount = subtotal
-
-    total = subtotal - discount
 
     curr.close()
     conn.close()
     
     return render(request, "checkout.html", {
         "items": items,
-        "demo":demo,
-        "subtotal": subtotal,
-        "total": total,
-        "discount": discount
+   
     })
     
     
