@@ -648,6 +648,7 @@ def update_cart(request):
 ################################
 ###### REMOVE FROM CART ########
 ################################
+
 def remove_from_cart(request):
     data=json.loads(request.body)
     cart_item_id=data["cart_item_id"]
@@ -676,61 +677,38 @@ def remove_from_cart(request):
 
 
 def checkout(request):
-    
     user_id = request.session.get("user_id")
+    
     if not user_id:
         return redirect("/signin/")
     
     conn = connect()
-    curr = conn.cursor()
+    
+    #we need a cursor of type 'RealDictCursor' in get_cart_summary(curr) to calculate price and total efficiently
+    from psycopg2.extras import RealDictCursor
+    curr = conn.cursor(cursor_factory=RealDictCursor)
     
     # Get cart_id for user
     curr.execute("select cart_id from store_cart where user_id=%s", (user_id,))
-    
-    cart_id = curr.fetchone()[0]
+    cart_row=curr.fetchone()
+    cart_id = cart_row["cart_id"]
    
     
-    checkout_data=get_cart_summary(cart_id,curr)
+    items,coupon,subtotal,discount,total=get_cart_summary(cart_id,curr)
 
     
     
-      return {
+    return render(request,'checkout.html',{
             "items": items,
             "coupon": coupon,
             "subtotal": subtotal,
             "discount": discount,
             "total": total
-        }
+        })
     
     
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    # Get items in cart
-    curr.execute("""select ci.cart_item_id, ci.product_id, ci.quantity, p.name, p.price, p.image_url, p.stock, p.description 
-        from store_cart_item as ci 
-        join "myApp_product" as p 
-        on ci.product_id = p.id
-        where ci.cart_id=%s""", (cart_id,))
-    items = curr.fetchall()
-
-     
-
-
-    curr.close()
-    conn.close()
-    
-    return render(request, "checkout.html", {
-        "items": items,
-   
-    })
     
     
 ################################
