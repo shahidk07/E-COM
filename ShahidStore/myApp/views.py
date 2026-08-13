@@ -694,13 +694,15 @@ def checkout(request):
     cart_id = cart_row["cart_id"]
    
     
-    items,coupon,subtotal,discount,total=get_cart_summary(cart_id,curr)
-
+    cart_summary=get_cart_summary(cart_id,curr)
+    items=cart_summary["items"]
+    subtotal=cart_summary["subtotal"]
+    discount=cart_summary["discount"]
+    total=cart_summary["total"]
     
     
     return render(request,'checkout.html',{
             "items": items,
-            "coupon": coupon,
             "subtotal": subtotal,
             "discount": discount,
             "total": total
