@@ -251,7 +251,7 @@
                         <div class="flex gap-2">
 
                             <input id="couponInput" type="text" placeholder="Enter coupon code" class="flex-1 min-w-0 border rounded-lg
-                   px-4 py-3 outline-none
+                   px-4 py-3 outline-none 
                    focus:border-cyan-500">
 
                             <button id="toggleCoupon" type="button"
@@ -358,7 +358,8 @@
 
             /////////////////////////////
             ///////  Increase   /////////
-            /////////////////////////////    
+            /////////////////////////////
+
             item.querySelector(".plusBtn").addEventListener("click", async () => {
                 if (stock > 0) {
                     const response = await fetch("/cart/update/", {
@@ -380,6 +381,7 @@
                         itemTotal.textContent = `₹${data.item_total}`;
                         document.getElementById("subtotal").textContent = `₹${data.subtotal}`;
                         document.getElementById("total").textContent = `₹${data.total}`;
+                        document.getElementById("discount").textContent = `₹${data.discount}`;
                     }
                 }
             });
@@ -409,6 +411,7 @@
                         itemTotal.textContent = `₹${data.item_total}`;
                         document.getElementById("subtotal").textContent = `₹${data.subtotal}`;
                         document.getElementById("total").textContent = `₹${data.total}`;
+                        document.getElementById("discount").textContent = `₹${data.discount}`;
                     }
                 }
                 else {
@@ -422,7 +425,10 @@
 
         });
 
-        //remove items from dom
+        ////////////////////////
+        //remove items from cart dom
+        ///////////////////////
+
         async function removeFunc(item, cart_item_id) {
             const response = await fetch('/cart/remove/', {
                 method: "DELETE",
@@ -439,6 +445,7 @@
                 document.getElementById("item-count").textContent =
                     document.querySelectorAll(".cart-item").length + " item(s)";
                 document.getElementById("subtotal").textContent = `₹${data.subtotal}`;
+                document.getElementById("discount").textContent = `₹${data.discount}`;
                 document.getElementById("total").textContent = `₹${data.total}`;
 
 
@@ -460,9 +467,27 @@
         /////////////////////////////
         //////////COUPONS///////////
         ///////////////////////////
+        
+        //default state for coupon 
+        const couponInput = document.getElementById("couponInput");
+        var toggleCoupon = document.getElementById("toggleCoupon");
 
-        let couponApplied=false;
+        let couponApplied={% if coupon %}true{% else %}false{% endif %};
 
+        coupon="{{coupon}}"
+
+        if(couponApplied){
+           couponInput.value=coupon;
+           toggleCoupon.textContent="Remove"
+
+        }
+        else{
+          couponInput.value="";
+          toggleCoupon.textContent="Apply"
+        }
+
+
+        //coupon button toggle
         document.getElementById("toggleCoupon").addEventListener("click",async ()=>{
         if(couponApplied){
          const removed=await removeCoupon();
@@ -482,7 +507,7 @@
 
         //apply coupon
         async function applyCoupon() {
-            const couponInput = document.getElementById("couponInput")
+    
             const code = couponInput.value.toUpperCase();
             var couponMessage = document.getElementById("couponMessage");
 
@@ -553,7 +578,6 @@
         async function removeCoupon() {
             const couponInput = document.getElementById("couponInput");
             const couponMessage = document.getElementById("couponMessage");
-            const toggleCoupon = document.getElementById("toggleCoupon");
 
             couponInput.value = "";
 

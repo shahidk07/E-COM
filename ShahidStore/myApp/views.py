@@ -246,7 +246,7 @@ def get_cart_summary(cart_id, curr):
         item["total_price"] = item["price"] * item["quantity"]
         subtotal += item["total_price"]
 
-    # Get currently applied coupon
+    # Get currently applied coupon data
     curr.execute("""
         SELECT
             c.applied_coupon_id,
@@ -261,52 +261,51 @@ def get_cart_summary(cart_id, curr):
         WHERE c.cart_id = %s
     """, (cart_id,))
 
-    cart = curr.fetchone()
+    coupon_data = curr.fetchone()
 
-    coupon = None
+    coupon_code = None
     discount = Decimal("0.00")
+    
+    if coupon_data["applied_coupon_id"] is not None:
 
-    if cart["applied_coupon_id"] is not None:
-
-        coupon = cart
+        coupon_code = coupon_data["code"]
 
         # Check minimum order
-        if subtotal >= coupon["minimum_order"]:
+        if subtotal >= coupon_data["minimum_order"]:
 
-            if coupon["discount_type"] == "percentage":
+            if coupon_data["discount_type"] == "percentage":
 
                 discount = (
                     subtotal *
-                    coupon["discount_value"] /
+                    coupon_data["discount_value"] /
                     Decimal("100")
                 )
 
                 # Apply maximum discount
-                if coupon["maximum_discount"] is not None:
+                if coupon_data["maximum_discount"] is not None:
                     discount = min(
                         discount,
-                        coupon["maximum_discount"]
+                        coupon_data["maximum_discount"]
                     )
 
-            elif coupon["discount_type"] == "fixed":
+            elif coupon_data["discount_type"] == "fixed":
 
                 discount = min(
-                    coupon["discount_value"],
+                    coupon_data["discount_value"],
                     subtotal
                 )
 
-            elif coupon["discount_type"] == "final_price":
+            elif coupon_data["discount_type"] == "final_price":
 
                 discount = max(
-                    subtotal - coupon["discount_value"],
+                    subtotal - coupon_data["discount_value"],
                     Decimal("0.00")
                 )
 
     total = subtotal - discount
-
     return {
         "items": items,
-        "coupon": coupon,
+        "coupon": coupon_code,
         "subtotal": subtotal,
         "discount": discount,
         "total": total
@@ -341,7 +340,7 @@ def cart(request):
 
 
 def apply_coupon(request):
-
+    
     if request.method != "POST":
         return JsonResponse(
             {"success": False, "message": "Invalid request method"},
@@ -608,7 +607,8 @@ def update_cart(request):
     cart_item_id=data["cart_item_id"]
 
     conn=connect()
-    curr=conn.cursor()
+    from psycopg2.extras import RealDictCursor
+    curr=conn.cursor(cursor_factory=RealDictCursor)
 
     # Update quantity
     if(action=="increase"):
@@ -616,33 +616,30 @@ def update_cart(request):
     else:
         curr.execute("update store_cart_item set quantity=quantity - 1 where cart_item_id=%s returning quantity, product_id",(cart_item_id,))
     row=curr.fetchone()
-    quantity=row[0]
-    product_id=row[1]
+    quantity=row["quantity"]
+    product_id=row["product_id"]
 
     # Get product price and stock
     curr.execute('select price, stock from "myApp_product" where id=%s',(product_id,))
     product_row=curr.fetchone()
-    price=product_row[0]
-    stock=product_row[1]
+    price=product_row["price"]
+    stock=product_row["stock"]
 
     item_total=price*quantity
 
     # Get cart_id from this cart_item
     curr.execute("select cart_id from store_cart_item where cart_item_id=%s",(cart_item_id,))
-    cart_id=curr.fetchone()[0]
+    cart_id=curr.fetchone()["cart_id"]
 
     # Compute subtotal from all items in the cart
-    curr.execute("""select coalesce(sum(ci.quantity * p.price), 0)
-        from store_cart_item ci
-        join "myApp_product" p on ci.product_id = p.id
-        where ci.cart_id=%s""",(cart_id,))
-    subtotal=curr.fetchone()[0]
-    total=subtotal  # shipping is free
+    cart_summary=get_cart_summary(cart_id,curr)
 
     conn.commit()
     curr.close()
     conn.close()
-    return JsonResponse({"quantity":quantity,"item_total":str(item_total),"subtotal":str(subtotal),"total":str(total),"stock":stock})
+    return JsonResponse({"quantity":quantity,"item_total":str(item_total),
+                         "subtotal":cart_summary["subtotal"],"total":cart_summary["total"],
+                         "stock":stock,"discount":cart_summary["discount"]})
 
 
 ################################
@@ -651,6 +648,7 @@ def update_cart(request):
 
 def remove_from_cart(request):
     data=json.loads(request.body)
+    
     cart_item_id=data["cart_item_id"]
     conn=connect()
     curr=conn.cursor()
@@ -661,19 +659,27 @@ def remove_from_cart(request):
 
     # Delete the item
     curr.execute("delete from store_cart_item where cart_item_id =%s",(cart_item_id,))
-
-    # Compute new subtotal from remaining items
-    curr.execute("""select coalesce(sum(ci.quantity * p.price), 0)
-        from store_cart_item ci
-        join "myApp_product" p on ci.product_id = p.id
-        where ci.cart_id=%s""",(cart_id,))
-    subtotal=curr.fetchone()[0]
-    total=subtotal  # shipping is free
-
     conn.commit()
     curr.close()
+    
+    from psycopg2.extras import RealDictCursor
+    curr=conn.cursor(cursor_factory=RealDictCursor)
+    
+    cart_summary=get_cart_summary(cart_id,curr)
+    items=cart_summary["items"]
+    total=cart_summary["total"]
+    subtotal=cart_summary["subtotal"]
+    discount=cart_summary["discount"]
+    coupon=cart_summary["coupon"]
     conn.close()
-    return JsonResponse({"subtotal":str(subtotal),"total":str(total)})
+    
+    return JsonResponse({
+        "items":items,
+        "total":total,
+        "subtotal":subtotal,
+        "discount":discount,
+        "coupon":coupon
+    })
 
 
 def checkout(request):
@@ -695,18 +701,8 @@ def checkout(request):
    
     
     cart_summary=get_cart_summary(cart_id,curr)
-    items=cart_summary["items"]
-    subtotal=cart_summary["subtotal"]
-    discount=cart_summary["discount"]
-    total=cart_summary["total"]
     
-    
-    return render(request,'checkout.html',{
-            "items": items,
-            "subtotal": subtotal,
-            "discount": discount,
-            "total": total
-        })
+    return render(request,'checkout.html',cart_summary)
     
     
     
