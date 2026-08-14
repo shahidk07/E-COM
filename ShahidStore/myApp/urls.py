@@ -16,6 +16,10 @@ http://127.0.0.1:8000/catalog/
 🛒 Cart
 http://127.0.0.1:8000/cart/
 
+Checkout
+http://127.0.0.1:8000/checkout/
+
+
 📦 signup
 http://127.0.0.1:8000/signup/
 
