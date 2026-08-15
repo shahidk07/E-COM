@@ -707,7 +707,54 @@ def checkout(request):
     
     
     
+################################
+########## PLACE ORDER #########
+################################
+
+def place_order(request):
+    data=request.POST
     
+    save_address=data.get("save_address")=="on"
+    
+    if(save_address):
+        save_address(data)
+    
+
+
+
+
+
+
+
+
+
+
+
+
+def save_address(data):
+    conn=connect()
+    curr=conn.cursor()
+    
+    user_id=data.get("user_id")
+    full_name=data.get("full_name")
+    phone_number=data.get("phone_number")
+    address_line1=data.get(address_line1)
+    address_line2=data.get(address_line2)
+    city=data.get(city)
+    state=data.get(state)
+    pincode=data.get(pincode)
+    curr.execute("""insert into store_addresses(
+        user_id,full_name,phone_number,
+        address_line1,address_line2,city,
+        state,
+        pincode
+        )
+        values(%s,%s,%s,%s,%s,%s,%s,%s)
+        """,user_id,full_name,phone_number,
+    address_line1,address_line2,city,state,pincode)
+
+
+
     
 ################################
 ############ LOGOUT ############

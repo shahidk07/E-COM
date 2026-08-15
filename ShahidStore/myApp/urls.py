@@ -44,5 +44,6 @@ urlpatterns = [
     path('remove_coupon/',views.remove_coupon,name="remove_coupon"),
     path("checkout/", views.checkout, name="checkout"),
     path("aboutus/", views.aboutus, name="aboutus"),
+    path("place_order/", views.place_order, name="place_order"),
     path("contact-us/", views.contact_us, name="contact_us"),
 ]
