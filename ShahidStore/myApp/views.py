@@ -718,7 +718,8 @@ def place_order(request):
     
     if(save_address):
         save_address(data)
-    
+    else:
+        user_id,full_name,phone_number,address_line1,address_line2,state,city,pincode=extract_address(data)
 
 
 
@@ -729,20 +730,23 @@ def place_order(request):
 
 
 
-
+def extract_address(data):
+        user_id=data.get("user_id")
+        full_name=data.get("full_name")
+        phone_number=data.get("phone_number")
+        address_line1=data.get(address_line1)
+        address_line2=data.get(address_line2)
+        state=data.get(state)
+        city=data.get(city)
+        pincode=data.get(pincode)
+        return user_id,full_name,phone_number,address_line1,address_line2,state,city,pincode
 
 def save_address(data):
     conn=connect()
     curr=conn.cursor()
     
-    user_id=data.get("user_id")
-    full_name=data.get("full_name")
-    phone_number=data.get("phone_number")
-    address_line1=data.get(address_line1)
-    address_line2=data.get(address_line2)
-    city=data.get(city)
-    state=data.get(state)
-    pincode=data.get(pincode)
+    user_id,full_name,phone_number,address_line1,address_line2,state,city,pincode=extract_address(data)
+    
     curr.execute("""insert into store_addresses(
         user_id,full_name,phone_number,
         address_line1,address_line2,city,
