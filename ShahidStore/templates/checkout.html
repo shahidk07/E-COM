@@ -598,27 +598,27 @@ const placeOrderBtn = document.getElementById("place-order-btn");
 const addressForm=document.getElementById("address-form");
 
 placeOrderBtn.addEventListener("click", ()=>{
-    
+       // 1. Validate address form
    if(!addressForm.checkValidity()){
     addressForm.reportValidity();
     return;
    }
-   placeOrder();
+     // 2. Get the currently selected payment method
+     const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
+     console.log(paymentMethod);
+    placeOrder();
 });
 
 async function placeOrder(){
-    const saveAddBtn=document.getElementById("save-address");
-         const form=document.getElementById("address-form");
-      const formData=new FormData(form);
-      const response=await fetch("/place_order/",{
+    const formData=new FormData(addressForm);
+    const response=await fetch("/place_order/",{
         method:"POST",
         headers:{
-            "X_CSRFToken":"{{csrf_token}}"
+            "X-CSRFToken":"{{csrf_token}}"
         },
         body:formData
       })
     }
-   
 </script>
 
 </body>

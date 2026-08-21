@@ -713,21 +713,22 @@ def checkout(request):
 
 def place_order(request):
     data=request.POST
+    payment_method=data.get("payment_method")
     
     save_address=data.get("save_address")=="on"
     user_id=request.session["user_id"]
     if(save_address):
         save_address(data,user_id)
-    else:
-        full_name,phone_number,address_line1,address_line2,state,city,pincode=extract_address(data)
-        conn=connect()
-        curr=conn.cursor()
-        curr.execute("""select subtotal,discount,total from store_cart where user_id=Z%s""",(user_id))
-        subtotal=curr.fetchone()[0]
-        discount=curr.fetchone()[1]
-        total=curr.fetchone()[2]
+    
+    full_name,phone_number,address_line1,address_line2,state,city,pincode=extract_address(data)
+    conn=connect()
+    curr=conn.cursor()
+    curr.execute("""select subtotal,discount,total from store_cart where user_id=Z%s""",(user_id))
+    subtotal=curr.fetchone()[0]
+    discount=curr.fetchone()[1]
+    total=curr.fetchone()[2]
         
-        curr.execute("""
+    curr.execute("""
                      insert into store_order(user_id,full_name,phone_number,address_line1,
                      address_line2,state,city,pincode,
                      subtotal,discount,total
@@ -735,10 +736,12 @@ def place_order(request):
                      values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
                      """,(user_id,full_name,phone_number,address_line1,address_line2,
                           state,city,pincode,subtotal,discount,total))
-        curr.close()
-        conn.close()
+    curr.close()
+    conn.close()
+    
+    if payment_method=="cod":
         
-
+    
 
 
 
