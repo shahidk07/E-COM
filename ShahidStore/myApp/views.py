@@ -733,10 +733,20 @@ def place_order(request):
                      returning order_id
                      """,(user_id,full_name,phone_number,address_line1,address_line2,
                           state,city,pincode,subtotal,discount,total,payment_method,"pending","confirmed"))
-    # order_id=curr.fetchone()["order_id"]
+    order_id=curr.fetchone()["order_id"]
     
-
-    
+    for item in order_items:
+        curr.execute("""
+                     insert into store_order_item(
+                         order_id,product_id,quantity,price
+                     )
+                     values(%s,%s,%s,%s)
+                     """,(
+        order_id,item["product_id"],
+        item["quantity"],
+        item["price"])
+        )
+        
     conn.commit()
     curr.close()
     conn.close()
