@@ -218,8 +218,13 @@ def create_account(request):
 
     
 
-def get_cart_summary(cart_id, curr):
-
+def get_cart_summary(curr,user_id):
+   
+    # Get cart_id for user
+    curr.execute("select cart_id from store_cart where user_id=%s", (user_id,))
+    cart_row=curr.fetchone()
+    cart_id = cart_row["cart_id"]
+    
     # Get cart items
     curr.execute("""
         SELECT
@@ -330,7 +335,7 @@ def cart(request):
     cart_id = cart["cart_id"]
     
     # Calculate cart
-    summary = get_cart_summary(cart_id, curr)
+    summary = get_cart_summary(curr,user_id)
     curr.close()
     conn.close()
     
@@ -430,7 +435,7 @@ def apply_coupon(request):
                 )
 
         # Get current cart summary
-        summary = get_cart_summary(cart_id, curr)
+        summary = get_cart_summary(curr,user_id)
 
         subtotal = summary["subtotal"]
 
@@ -457,7 +462,7 @@ def apply_coupon(request):
         conn.commit()
 
         # Recalculate using the newly applied coupon
-        summary = get_cart_summary(cart_id, curr)
+        summary = get_cart_summary(curr,user_id)
 
         return JsonResponse({
             "success": True,
@@ -532,7 +537,7 @@ def remove_coupon(request):
         conn.commit()
 
         # Recalculate cart after removing coupon
-        summary = get_cart_summary(cart_id, curr)
+        summary = get_cart_summary(curr,user_id)
 
         return JsonResponse({
             "success": True,
@@ -602,6 +607,7 @@ def add_to_cart(request):
 ######### UPDATE CART ##########
 ################################
 def update_cart(request):
+    user_id=request.session["user_id"]
     data=json.loads(request.body)
     action=data["action"]
     cart_item_id=data["cart_item_id"]
@@ -627,12 +633,8 @@ def update_cart(request):
 
     item_total=price*quantity
 
-    # Get cart_id from this cart_item
-    curr.execute("select cart_id from store_cart_item where cart_item_id=%s",(cart_item_id,))
-    cart_id=curr.fetchone()["cart_id"]
-
     # Compute subtotal from all items in the cart
-    cart_summary=get_cart_summary(cart_id,curr)
+    cart_summary=get_cart_summary(curr,user_id)
 
     conn.commit()
     curr.close()
@@ -653,10 +655,6 @@ def remove_from_cart(request):
     conn=connect()
     curr=conn.cursor()
 
-    # Get the cart_id before deleting
-    curr.execute("select cart_id from store_cart_item where cart_item_id=%s",(cart_item_id,))
-    cart_id=curr.fetchone()[0]
-
     # Delete the item
     curr.execute("delete from store_cart_item where cart_item_id =%s",(cart_item_id,))
     conn.commit()
@@ -665,7 +663,8 @@ def remove_from_cart(request):
     from psycopg2.extras import RealDictCursor
     curr=conn.cursor(cursor_factory=RealDictCursor)
     
-    cart_summary=get_cart_summary(cart_id,curr)
+    #update the cart
+    cart_summary=get_cart_summary(curr)
     items=cart_summary["items"]
     total=cart_summary["total"]
     subtotal=cart_summary["subtotal"]
@@ -694,13 +693,7 @@ def checkout(request):
     from psycopg2.extras import RealDictCursor
     curr = conn.cursor(cursor_factory=RealDictCursor)
     
-    # Get cart_id for user
-    curr.execute("select cart_id from store_cart where user_id=%s", (user_id,))
-    cart_row=curr.fetchone()
-    cart_id = cart_row["cart_id"]
-   
-    
-    cart_summary=get_cart_summary(cart_id,curr)
+    cart_summary=get_cart_summary(curr,user_id)
     
     return render(request,'checkout.html',cart_summary)
     
@@ -712,35 +705,43 @@ def checkout(request):
 ################################
 
 def place_order(request):
-    data=request.POST
-    payment_method=data.get("payment_method")
-    
-    save_address=data.get("save_address")=="on"
     user_id=request.session["user_id"]
-    if(save_address):
+    data=request.POST
+    save_address_requested=data.get("save_address")=="on"
+    
+    if(save_address_requested):
         save_address(data,user_id)
     
-    full_name,phone_number,address_line1,address_line2,state,city,pincode=extract_address(data)
+    full_name,phone_number,address_line1,address_line2,state,city,pincode,payment_method=extract_address(data)
+    
+    from psycopg2.extras import RealDictCursor
     conn=connect()
-    curr=conn.cursor()
-    curr.execute("""select subtotal,discount,total from store_cart where user_id=Z%s""",(user_id))
-    subtotal=curr.fetchone()[0]
-    discount=curr.fetchone()[1]
-    total=curr.fetchone()[2]
-        
+    curr=conn.cursor(cursor_factory=RealDictCursor)
+    
+    order_summary = get_cart_summary(curr,user_id)
+    order_items = order_summary["items"]
+    subtotal = order_summary["subtotal"]
+    discount = order_summary["discount"]
+    total = order_summary["total"]
     curr.execute("""
                      insert into store_order(user_id,full_name,phone_number,address_line1,
                      address_line2,state,city,pincode,
-                     subtotal,discount,total
+                     subtotal,discount,total,payment_method,
+                     payment_status,order_status
                      ) 
-                     values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                     values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                     returning order_id
                      """,(user_id,full_name,phone_number,address_line1,address_line2,
-                          state,city,pincode,subtotal,discount,total))
+                          state,city,pincode,subtotal,discount,total,payment_method,"pending","confirmed"))
+    # order_id=curr.fetchone()["order_id"]
+    
+
+    
+    conn.commit()
     curr.close()
     conn.close()
+    return JsonResponse({"message":100,"status":200})
     
-    if payment_method=="cod":
-        
     
 
 
@@ -758,7 +759,10 @@ def extract_address(data):
         state=data.get("state")
         city=data.get("city")
         pincode=data.get("pincode")
-        return full_name,phone_number,address_line1,address_line2,state,city,pincode
+        payment_method=data.get("payment_method")
+        print("POST DATA:")
+        print(data)
+        return full_name,phone_number,address_line1,address_line2,state,city,pincode,payment_method
 
 def save_address(data,user_id):
     conn=connect()
@@ -770,7 +774,7 @@ def save_address(data,user_id):
         user_id,full_name,phone_number,
         address_line1,address_line2,city,
         state,
-        pincode
+        pincode,
         )
         values(%s,%s,%s,%s,%s,%s,%s,%s)
         """,user_id,full_name,phone_number,

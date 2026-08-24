@@ -173,7 +173,7 @@
                                 <input
                                     id="phone-number"
                                     type="tel"
-                                    name="phone"
+                                    name="phone_number"
                                     placeholder="Enter your phone number"
                                     required
                                     class="checkout-input w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl text-sm outline-none"
@@ -200,7 +200,7 @@
                             <input
                                 id="address-line-1"
                                 type="text"
-                                name="address_line_1"
+                                name="address_line1"
                                 placeholder="House no., Building, Street"
                                 required
                                 class="checkout-input w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl text-sm outline-none"
@@ -224,7 +224,7 @@
                             <input
                                 id="address-line-2"
                                 type="text"
-                                name="address_line_2"
+                                name="address_line2"
                                 placeholder="Apartment, Landmark, etc."
                                 class="checkout-input w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl text-sm outline-none"
                             >
@@ -603,14 +603,20 @@ placeOrderBtn.addEventListener("click", ()=>{
     addressForm.reportValidity();
     return;
    }
-     // 2. Get the currently selected payment method
-     const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
-     console.log(paymentMethod);
     placeOrder();
 });
 
 async function placeOrder(){
     const formData=new FormData(addressForm);
+     // 2. Get the currently selected payment method
+     const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
+    formData.append("payment_method",paymentMethod);
+
+    //check 
+        for (const [key, value] of formData.entries()) {
+        console.log(key, value);
+    }
+
     const response=await fetch("/place_order/",{
         method:"POST",
         headers:{
