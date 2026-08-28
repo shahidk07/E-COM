@@ -708,10 +708,9 @@ def place_order(request):
     user_id=request.session["user_id"]
     data=request.POST
     save_address_requested=data.get("save_address")=="on"
-    
     if(save_address_requested):
         save_address(data,user_id)
-    
+        print(save_address)
     full_name,phone_number,address_line1,address_line2,state,city,pincode,payment_method=extract_address(data)
     
     from psycopg2.extras import RealDictCursor
@@ -719,7 +718,16 @@ def place_order(request):
     curr=conn.cursor(cursor_factory=RealDictCursor)
     
     order_summary = get_cart_summary(curr,user_id)
+    
+    #avoid empty orders
     order_items = order_summary["items"]
+    if not order_items:
+        conn.close()
+        return JsonResponse({
+        "success": False,
+        "message": "Your cart is empty."
+        }, status=400)
+    print(order_items)
     subtotal = order_summary["subtotal"]
     discount = order_summary["discount"]
     total = order_summary["total"]
@@ -746,11 +754,11 @@ def place_order(request):
         item["quantity"],
         item["price"])
         )
-        
-    conn.commit()
+    
+    
     curr.close()
     conn.close()
-    return JsonResponse({"message":100,"status":200})
+    return JsonResponse({"order_id":order_id,"status":200})
     
     
 
@@ -778,20 +786,40 @@ def save_address(data,user_id):
     conn=connect()
     curr=conn.cursor()
     
-    full_name,phone_number,address_line1,address_line2,state,city,pincode=extract_address(data)
+    full_name,phone_number,address_line1,address_line2,state,city,pincode,_=extract_address(data)
     
-    curr.execute("""insert into store_addresses(
+    curr.execute("""insert into store_address(
         user_id,full_name,phone_number,
         address_line1,address_line2,city,
         state,
-        pincode,
+        pincode
         )
         values(%s,%s,%s,%s,%s,%s,%s,%s)
-        """,user_id,full_name,phone_number,
-    address_line1,address_line2,city,state,pincode)
+        """,(user_id,full_name,phone_number,
+    address_line1,address_line2,city,state,pincode))
+    conn.commit()
+    print("Address saved into database")
+    curr.close()
+    conn.close()
 
+###########################
+########cart_reset#########
+###########################
 
-    
+def cart_reset(curr, cart_id):
+    curr.execute("""
+        DELETE FROM store_cart_item
+        WHERE cart_id = %s
+    """, (cart_id,))
+
+    curr.execute("""
+        UPDATE store_cart
+        SET subtotal = 0,
+            discount = 0,
+            total = 0,
+            applied_coupon_id = NULL
+        WHERE cart_id = %s
+    """, (cart_id,))
 ################################
 ############ LOGOUT ############
 ################################
