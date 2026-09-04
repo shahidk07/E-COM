@@ -625,6 +625,16 @@ async function placeOrder(){
         },
         body:formData
       })
+    
+    const result= await response.json();
+    console.log("SERVER RESPONSE:", result);
+    if (result.status==200) {
+    alert(result.message);
+
+    setTimeout(() => {
+        window.location.href = "/catalog/";
+    }, 2000);
+}
     }
 </script>
 

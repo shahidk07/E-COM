@@ -313,7 +313,8 @@ def get_cart_summary(curr,user_id):
         "coupon": coupon_code,
         "subtotal": subtotal,
         "discount": discount,
-        "total": total
+        "total": total,
+        "cart_id":cart_id
     }
     
 def cart(request):
@@ -681,6 +682,19 @@ def remove_from_cart(request):
     })
 
 
+#####################
+#######Clear Cart####
+#####################
+
+def clear_cart(curr,cart_id):
+    curr.execute("""DELETE FROM store_cart_item
+                 WHERE cart_id=%s""",(cart_id,))
+    
+
+######################
+#######CHECKOUT ######
+######################
+
 def checkout(request):
     user_id = request.session.get("user_id")
     
@@ -718,6 +732,9 @@ def place_order(request):
     curr=conn.cursor(cursor_factory=RealDictCursor)
     
     order_summary = get_cart_summary(curr,user_id)
+    cart_id=order_summary["cart_id"]
+    
+    
     
     #avoid empty orders
     order_items = order_summary["items"]
@@ -754,11 +771,14 @@ def place_order(request):
         item["quantity"],
         item["price"])
         )
-    
+        
+    # clear store_cart_item and reset store_cart
+    clear_cart(curr,cart_id)
+    conn.commit()
     
     curr.close()
     conn.close()
-    return JsonResponse({"order_id":order_id,"status":200})
+    return JsonResponse({"order_id":order_id,"status":200, "message": "Order placed successfully!"})
     
     
 
@@ -820,6 +840,35 @@ def cart_reset(curr, cart_id):
             applied_coupon_id = NULL
         WHERE cart_id = %s
     """, (cart_id,))
+    
+    
+    
+    
+################################
+########## ORDER PAGE ##########
+################################
+def orders(request):
+    user_id=request.session["user_id"]
+    conn=connect()
+    from psycopg2.extras import RealDictCursor
+    curr=conn.cursor(cursor_factory=RealDictCursor)
+    
+    all_orders={}
+    curr.execute("""
+                 SELECT order_id from store_order where user_id=%s
+                 """,(user_id))
+    orders=curr.fetchall()
+    for order in orders:
+        curr.execute("""
+                     select * from store_order_item where order_id=%s,
+                     """(order))
+        current_order=curr.fetchall()
+        all_orders
+    return render(request,"orders.html")
+    
+    
+    
+    
 ################################
 ############ LOGOUT ############
 ################################

@@ -19,6 +19,8 @@ http://127.0.0.1:8000/cart/
 Checkout
 http://127.0.0.1:8000/checkout/
 
+ORDERS
+http://127.0.0.1:8000/orders/
 
 📦 signup
 http://127.0.0.1:8000/signup/
@@ -45,5 +47,6 @@ urlpatterns = [
     path("checkout/", views.checkout, name="checkout"),
     path("aboutus/", views.aboutus, name="aboutus"),
     path("place_order/", views.place_order, name="place_order"),
+    path("orders/", views.orders, name="orders"),
     path("contact-us/", views.contact_us, name="contact_us"),
 ]
