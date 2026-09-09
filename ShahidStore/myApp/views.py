@@ -702,14 +702,16 @@ def checkout(request):
         return redirect("/signin/")
     
     conn = connect()
-    
     #we need a cursor of type 'RealDictCursor' in get_cart_summary(curr) to calculate price and total efficiently
     from psycopg2.extras import RealDictCursor
     curr = conn.cursor(cursor_factory=RealDictCursor)
     
     cart_summary=get_cart_summary(curr,user_id)
     
-    return render(request,'checkout.html',cart_summary)
+    addresses=get_addresses(user_id)
+    address_found=bool(addresses)
+    return render(request,'checkout.html',{"cart_summary":cart_summary,"address_found":address_found,"addresses":addresses})
+
     
     
     
@@ -794,6 +796,17 @@ def extract_address(data):
         print(data)
         return full_name,phone_number,address_line1,address_line2,state,city,pincode,payment_method
 
+def get_addresses(user_id):
+    from psycopg2.extras import RealDictCursor
+    conn=connect()
+    curr=conn.cursor(cursor_factory=RealDictCursor)
+    
+    curr.execute("""select * from store_address where user_id=%s
+                 ORDER BY created_at DESC limit 3""",(user_id,))
+    addresses=curr.fetchall()
+    return addresses
+    
+    
 def save_address(data,user_id):
     conn=connect()
     curr=conn.cursor()
@@ -807,6 +820,7 @@ def save_address(data,user_id):
         pincode
         )
         values(%s,%s,%s,%s,%s,%s,%s,%s)
+        ON CONFLICT DO NOTHING
         """,(user_id,full_name,phone_number,
     address_line1,address_line2,city,state,pincode))
     conn.commit()

@@ -113,7 +113,94 @@
             <!-- ========================= -->
             <!-- SHIPPING ADDRESS CARD     -->
             <!-- ========================= -->
+{% if address_found %}
 
+<section id="saved-addresses-section" class="space-y-4">
+
+    <h2 class="text-lg font-semibold text-gray-900">
+        Saved Addresses
+    </h2>
+
+    {% for address in addresses %}
+
+    <div class="saved-address-card border rounded-xl p-5 flex items-start gap-4">
+
+        <!-- Select address -->
+        <input
+            type="radio"
+            name="saved_address"
+            value="{{ address.address_id }}"
+            class="mt-1 w-5 h-5"
+        >
+
+        <!-- Address information -->
+        <div class="flex-1">
+
+            <p class="font-semibold text-gray-900">
+                {{ address.full_name }}
+            </p>
+
+            <p class="text-gray-600">
+                {{ address.phone_number }}
+            </p>
+
+            <p class="text-gray-600 mt-2">
+                {{ address.address_line1 }}
+            </p>
+
+            {% if address.address_line2 %}
+                <p class="text-gray-600">
+                    {{ address.address_line2 }}
+                </p>
+            {% endif %}
+
+            <p class="text-gray-600">
+                {{ address.city }}, {{ address.state }} - {{ address.pincode }}
+            </p>
+
+        </div>
+
+        <!-- Edit/Delete -->
+        <div class="flex gap-2">
+
+            <button
+                type="button"
+                class="edit-address px-3 py-2 border rounded-lg"
+                data-address-id="{{ address.address_id }}"
+            >
+                Edit
+            </button>
+
+            <button
+                type="button"
+                class="delete-address px-3 py-2 border rounded-lg"
+                data-address-id="{{ address.address_id }}"
+            >
+                Delete
+            </button>
+
+        </div>
+
+    </div>
+
+    {% endfor %}
+
+</section>
+
+<div id="add-address-card"
+    class="border-2 border-dashed rounded-xl p-6
+           flex items-center justify-center
+           cursor-pointer
+           hover:bg-gray-50 transition"
+>
+    <span class="font-semibold text-gray-700">
+        + Add New Address
+    </span>
+</div>
+
+{% endif %}
+
+{% if not address_found %}
             <section id="shipping-section" class="bg-white border border-gray-200 rounded-2xl p-6 sm:p-8">
 
                 <!-- Section header -->
@@ -322,6 +409,7 @@
                 </form>
 
             </section>
+{% endif %}
 
 
             <!-- ========================= -->
@@ -594,6 +682,34 @@
 </div>
 
 
+
+<placed id=""></placed>
+<div id="orderSuccessModal"
+     class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm">
+
+    <div class="w-[90%] max-w-md rounded-2xl bg-white p-8 text-center shadow-2xl">
+
+        <!-- Success icon -->
+        <div class="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-green-100">
+            <span class="text-4xl text-green-600">✓</span>
+        </div>
+
+        <h2 class="mb-2 text-2xl font-bold text-gray-800">
+            Order Placed!
+        </h2>
+
+        <p class="mb-6 text-gray-500">
+            Your order has been placed successfully.
+        </p>
+
+        <button id="continueShopping"
+                class="rounded-lg bg-black px-6 py-3 font-medium text-white transition hover:bg-gray-800">
+            Continue Shopping
+        </button>
+
+    </div>
+</div>
+
 <script>
 const placeOrderBtn = document.getElementById("place-order-btn");
 const addressForm=document.getElementById("address-form");
@@ -629,13 +745,22 @@ async function placeOrder(){
     const result= await response.json();
     console.log("SERVER RESPONSE:", result);
     if (result.status==200) {
-    alert(result.message);
+    showOrderSuccess();
 
     setTimeout(() => {
-        window.location.href = "/catalog/";
+        window.location.href = "/orders/";
     }, 2000);
 }
     }
+
+
+
+function showOrderSuccess() {
+    const modal = document.getElementById("orderSuccessModal");
+
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+}
 </script>
 
 </body>
