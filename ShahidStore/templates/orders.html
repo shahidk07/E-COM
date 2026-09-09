@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -200,7 +201,7 @@
                     <tbody class="divide-y divide-gray-100">
 
 
-                        {% for order in orders %}
+                        {% for order in orders.values %}
 
                         <tr class="hover:bg-gray-50 transition">
 
@@ -223,7 +224,7 @@
                                        text-sm
                                        text-gray-600">
 
-                                {{ order.created_at|date:"d M Y" }}
+                                {{ order.date}}
 
                             </td>
 
@@ -529,7 +530,14 @@
         </div>
 
     </footer>
+    {{ orders|json_script:"orders-data" }}
+<script>
+  const orders = JSON.parse(
+        document.getElementById("orders-data").textContent
+    );
 
+    console.log(orders);
+</script>
 
 </body>
 

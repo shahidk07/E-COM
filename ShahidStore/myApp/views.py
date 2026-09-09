@@ -779,14 +779,6 @@ def place_order(request):
     curr.close()
     conn.close()
     return JsonResponse({"order_id":order_id,"status":200, "message": "Order placed successfully!"})
-    
-    
-
-
-
-
-
-
 
 
 def extract_address(data):
@@ -853,18 +845,26 @@ def orders(request):
     from psycopg2.extras import RealDictCursor
     curr=conn.cursor(cursor_factory=RealDictCursor)
     
-    all_orders={}
     curr.execute("""
-                 SELECT order_id from store_order where user_id=%s
-                 """,(user_id))
+                 select * from store_order where user_id=%s
+                 """,(user_id,))
+    
     orders=curr.fetchall()
+    
+    orders_data={}
     for order in orders:
-        curr.execute("""
-                     select * from store_order_item where order_id=%s,
-                     """(order))
-        current_order=curr.fetchall()
-        all_orders
-    return render(request,"orders.html")
+        order_id=order["order_id"]
+        payment_status=order["payment_status"]
+        payment_method=order["payment_method"]
+        order_status=order["order_status"]
+        total=order["total"]
+        created_at=order["created_at"]
+        
+        date=created_at.date()
+        
+        orders_data[order_id]={"order_id":order_id,"date":date,"total":total,"payment_status":payment_status,"order_status":order_status,"payment_method":payment_method}
+    
+    return render(request,"orders.html",{"orders": orders_data})
     
     
     
