@@ -200,8 +200,9 @@
 
 {% endif %}
 
-{% if not address_found %}
-            <section id="shipping-section" class="bg-white border border-gray-200 rounded-2xl p-6 sm:p-8">
+            <section id="shipping-section" class="bg-white border border-gray-200 rounded-2xl p-6 sm:p-8
+            {% if address_found %}hidden{% endif %}
+            ">
 
                 <!-- Section header -->
                 <div class="flex items-center gap-3 mb-2">
@@ -219,7 +220,7 @@
 
 
                 <!-- Address form -->
-                <form id="address-form" class="space-y-5">
+                <form id="address-form" class="space-y-5 ">
 
                     <!-- Full Name + Phone -->
                     <div class="grid sm:grid-cols-2 gap-5">
@@ -409,7 +410,6 @@
                 </form>
 
             </section>
-{% endif %}
 
 
             <!-- ========================= -->
@@ -497,7 +497,7 @@
                 <!-- Items header -->
                 <div class="flex justify-between items-center mb-5">
                     <span class="text-sm text-gray-600 font-medium">
-                        Items ({{ items|length }})
+                        Items ({{ cart_summary.items|length }})
                     </span>
                     <a href="/cart/" class="text-sm font-semibold text-brand-600 hover:text-brand-700 transition-colors">
                         Edit Cart
@@ -508,7 +508,7 @@
                 <!-- Cart items list -->
                 <div class="space-y-4">
 
-                    {% for item in items %}
+                    {% for item in cart_summary.items %}
                     <div class="flex items-center gap-3 pb-4 border-b border-gray-100 last:border-b-0 last:pb-0">
 
                         <!-- Product thumbnail -->
@@ -548,7 +548,7 @@
 
                     <div class="flex justify-between text-sm">
                         <span class="text-gray-600">Subtotal</span>
-                        <span id="subtotal" class="font-medium text-gray-900">₹{{ subtotal }}</span>
+                        <span id="subtotal" class="font-medium text-gray-900">₹{{ cart_summary.subtotal }}</span>
                     </div>
 
                     <div class="flex justify-between text-sm">
@@ -558,7 +558,7 @@
 
                     <div class="flex justify-between text-sm">
                         <span class="text-gray-600">Discount</span>
-                        <span id="discount" class="font-semibold text-rose-500">- ₹{{ discount }}</span>
+                        <span id="discount" class="font-semibold text-rose-500">- ₹{{ cart_summary.discount }}</span>
                     </div>
 
                 </div>
@@ -568,7 +568,7 @@
                 <div class="border-t border-gray-200 mt-4 pt-4">
                     <div class="flex justify-between items-center bg-gray-50 rounded-xl px-4 py-3">
                         <span class="text-base font-bold text-gray-900">Total</span>
-                        <span id="total" class="text-xl font-extrabold text-gray-900">₹{{ total }}</span>
+                        <span id="total" class="text-xl font-extrabold text-gray-900">₹{{ cart_summary.total }}</span>
                     </div>
                 </div>
 
@@ -724,7 +724,20 @@ placeOrderBtn.addEventListener("click", ()=>{
 });
 
 async function placeOrder(){
-    const formData=new FormData(addressForm);
+    const selectedAddress=document.querySelector(
+        'input[name="saved_address"]:checked');
+    
+        let formData;
+        if(selectedAddress){
+            const addressId=selectedAddress.value;
+            formData=new formData();
+            formData.append("address_id",addressId);
+            console.log("Using saved address:", addressId);
+        }
+        else{
+           formData=new formData(addressForm);
+            console.log("Using new address form");
+        }
      // 2. Get the currently selected payment method
      const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
     formData.append("payment_method",paymentMethod);
@@ -761,6 +774,46 @@ function showOrderSuccess() {
     modal.classList.remove("hidden");
     modal.classList.add("flex");
 }
+
+
+
+<!-- Address Toggling-->
+const add_address_card=document.getElementById("add-address-card");
+const saved_addresses_section=document.getElementById("saved-addresses-section");
+const add_address_form=document.getElementById("shipping-section");
+
+add_address_card.addEventListener("click",()=>{
+    add_address_card.classList.add("hidden")
+    saved_addresses_section.classList.add("hidden")
+    add_address_form.classList.remove("hidden");
+
+})
+
+
+<!-- Saved Address-->
+const savedAddressRadios=document.querySelectorAll(
+    'input[name="saved_address"]');
+
+savedAddressRadios.forEach((radio) => {
+
+    radio.addEventListener("change", () => {
+
+        const addressId = radio.value;
+
+        console.log("Selected address ID:", addressId);
+
+    });
+
+})
+
+    
+    
+
+
+
+
+
+
 </script>
 
 </body>

@@ -723,6 +723,11 @@ def checkout(request):
 def place_order(request):
     user_id=request.session["user_id"]
     data=request.POST
+    
+    if(data.address_id):
+        address_id=data.address_id
+        full_name,phone_number,address_line1,address_line2,state,city,pincode,payment_method=
+    
     save_address_requested=data.get("save_address")=="on"
     if(save_address_requested):
         save_address(data,user_id)
@@ -784,6 +789,8 @@ def place_order(request):
 
 
 def extract_address(data):
+            
+            
         full_name=data.get("full_name")
         phone_number=data.get("phone_number")
         address_line1=data.get("address_line1")
