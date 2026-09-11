@@ -531,13 +531,6 @@
 
     </footer>
     {{ orders|json_script:"orders-data" }}
-<script>
-  const orders = JSON.parse(
-        document.getElementById("orders-data").textContent
-    );
-
-    console.log(orders);
-</script>
 
 </body>
 

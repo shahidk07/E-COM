@@ -673,7 +673,7 @@
         <span>Place Order</span>
 
         <span class="ml-auto bg-white/20 px-4 py-1 rounded-lg text-base">
-            ₹{{ total }}
+            ₹{{ cart_summary.total }}
         </span>
 
     </button>
@@ -713,10 +713,10 @@
 <script>
 const placeOrderBtn = document.getElementById("place-order-btn");
 const addressForm=document.getElementById("address-form");
-
+let addressId;
 placeOrderBtn.addEventListener("click", ()=>{
        // 1. Validate address form
-   if(!addressForm.checkValidity()){
+   if(!addressForm.checkValidity() && !addressId){
     addressForm.reportValidity();
     return;
    }
@@ -729,13 +729,13 @@ async function placeOrder(){
     
         let formData;
         if(selectedAddress){
-            const addressId=selectedAddress.value;
-            formData=new formData();
+            addressId=selectedAddress.value;
+            formData=new FormData();
             formData.append("address_id",addressId);
             console.log("Using saved address:", addressId);
         }
         else{
-           formData=new formData(addressForm);
+           formData=new FormData(addressForm);
             console.log("Using new address form");
         }
      // 2. Get the currently selected payment method
@@ -798,7 +798,7 @@ savedAddressRadios.forEach((radio) => {
 
     radio.addEventListener("change", () => {
 
-        const addressId = radio.value;
+        addressId = radio.value;
 
         console.log("Selected address ID:", addressId);
 
