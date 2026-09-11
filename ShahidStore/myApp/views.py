@@ -708,7 +708,7 @@ def checkout(request):
     
     cart_summary=get_cart_summary(curr,user_id)
     
-    addresses=get_addresses(user_id)
+    addresses=get_all_addresses(user_id)
     address_found=bool(addresses)
     return render(request,'checkout.html',{"cart_summary":cart_summary,"address_found":address_found,"addresses":addresses})
 
@@ -724,16 +724,19 @@ def place_order(request):
     user_id=request.session["user_id"]
     data=request.POST
     
-    if(data.address_id):
+    #when a new address is used
+    if(not data.address_id):
+        save_address_requested=data.get("save_address")=="on"
+        if(save_address_requested):
+            save_address(data,user_id)
+            print(save_address)
+        full_name,phone_number,address_line1,address_line2,state,city,pincode,payment_method=extract_address(data)
+    
+    #when a saved address is used 
+    else:
         address_id=data.address_id
-        full_name,phone_number,address_line1,address_line2,state,city,pincode,payment_method=
-    
-    save_address_requested=data.get("save_address")=="on"
-    if(save_address_requested):
-        save_address(data,user_id)
-        print(save_address)
-    full_name,phone_number,address_line1,address_line2,state,city,pincode,payment_method=extract_address(data)
-    
+        full_name,phone_number,address_line1,address_line2,state,city,pincode,payment_method=get_selected_address(address_id)
+        
     from psycopg2.extras import RealDictCursor
     conn=connect()
     curr=conn.cursor(cursor_factory=RealDictCursor)
@@ -789,8 +792,6 @@ def place_order(request):
 
 
 def extract_address(data):
-            
-            
         full_name=data.get("full_name")
         phone_number=data.get("phone_number")
         address_line1=data.get("address_line1")
@@ -803,17 +804,35 @@ def extract_address(data):
         print(data)
         return full_name,phone_number,address_line1,address_line2,state,city,pincode,payment_method
 
-def get_addresses(user_id):
+def get_all_addresses(user_id):
     from psycopg2.extras import RealDictCursor
     conn=connect()
     curr=conn.cursor(cursor_factory=RealDictCursor)
-    
+
     curr.execute("""select * from store_address where user_id=%s
-                 ORDER BY created_at DESC limit 3""",(user_id,))
+             ORDER BY created_at DESC limit 3""",(user_id,))
     addresses=curr.fetchall()
     return addresses
-    
-    
+
+        
+def get_selected_address(address_id):
+    from psycopg2.extras import RealDictCursor
+    conn=connect()
+    curr=conn.cursor(cursor_factory=RealDictCursor)
+    curr.execute("""
+                 select full_name,phone_number,address_line1,address_line2,state,city,pincode,payment_method from store_address where address_id=%s
+                 """,(address_id,))
+    address=curr.fetchall()
+    full_name=address["full_name"]
+    phone_number=address["phone_number"]
+    address_line1=address["address_line1"]
+    address_line2=address["address_line2"]
+    state=address["state"]
+    city=address["city"]
+    pincode=address["pincode"]
+    payment_method=address["payment_method"]
+    return full_name,phone_number,address_line1,address_line2,state,city,pincode,payment_method
+        
 def save_address(data,user_id):
     conn=connect()
     curr=conn.cursor()
