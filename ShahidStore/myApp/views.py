@@ -7,6 +7,8 @@ from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from .models import Product
+import razorpay
+from django.conf import settings
 
 
 # Create your views here.
@@ -924,3 +926,21 @@ def aboutus(request):
 
 def contact_us(request):
     return render(request, "contact_us.html")
+
+
+
+####################################
+####################################
+#******ONLINE PAYMENTS SYSTEM******#
+####################################
+####################################
+
+
+#create the Razorpay client.
+
+client =razorpay.Client(auth=(
+    settings.RAZORPAY_KEY_ID,
+    settings.RAZORPAY_KEY_SECRET
+))
+
+#This is the object Django will use to communicate with Razorpay.
