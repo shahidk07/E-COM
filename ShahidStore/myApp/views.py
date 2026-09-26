@@ -79,14 +79,16 @@ def details(request,id):
     product=Product.objects.get(id=id)
     return render(request,'prod_details.html',{"product":product})
 
-    
+import os
 def connect():
-    conn=psycopg2.connect(
-                            database="shahidstore",
-                            user="shahid",
-                            password="12345678",
-                            host="localhost",
-                            port="5432",)
+    conn = psycopg2.connect(
+        database=os.getenv("DB_NAME"),
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD"),
+        host=os.getenv("DB_HOST"),
+        port=os.getenv("DB_PORT"),
+        sslmode="require",
+    )
     return conn
 
 
@@ -856,6 +858,22 @@ def save_address(data,user_id):
     print("Address saved into database")
     curr.close()
     conn.close()
+
+def delete_address(request):
+    try:
+        data=json.loads(request.body)
+        address_id=data.get("address_id")
+        conn=connect()
+        curr=conn.cursor()
+        curr.execute("""delete from store_address where address_id=%s""",(address_id,)) 
+        conn.commit()
+        curr.close()
+        conn.close()
+        return JsonResponse({"status":200,"message":"Address Deleted"})
+    except Exception as e:
+        print(e)
+        return JsonResponse({"status":500,"message":"Address cannot be deleted for some reason"})
+
 
 ###########################
 ########cart_reset#########

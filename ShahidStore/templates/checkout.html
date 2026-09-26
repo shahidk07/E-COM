@@ -966,6 +966,8 @@ const backBtn = document.getElementById("back-to-saved-btn");
 
 if (addAddressCard) {
     addAddressCard.addEventListener("click", () => {
+        addressId = null;
+        add_address_card.classList.add("hidden");
         savedSection.classList.add("hidden");
         shipSection.classList.remove("hidden");
     });
@@ -998,6 +1000,67 @@ addrCards.forEach(card => {
         r.dispatchEvent(new Event('change'));
     });
 });
+
+/* ===== EDIT / DELETE ADDRESS ===== */
+const delBtns=document.getElementsByClassName("btn-del");
+// const editBtns=document.getElementsByClassName("btn-edit");
+
+for (const delBtn of delBtns){
+    delBtn.addEventListener("click",async()=>{
+    var addressId=delBtn.dataset.addressId;
+    console.log("Deleting address with address id",addressId);
+    const response=await fetch("/delete_address/",{
+        method:"DELETE",
+        headers:{"X-CSRFToken":"{{csrf_token }}"},
+        body:JSON.stringify({"address_id":addressId})
+    })
+    const result=await response.json();
+    console.log(result.message);
+    console.log(result.status);
+     if (response.ok) {
+            
+        //delBtn.closest(".address-card") means  tarting from the clicked Delete button, find the nearest parent element having the class .address-card.
+            const addressCard = delBtn.closest(".addr-card");
+
+            addressCard.remove();
+        }
+});
+}
+
+
+// editbtn.addEventListener("click",async()=>{
+//     editButton.addEventListener("click", () => {
+
+//     // 1. Get ID
+//     const addressId = editButton.dataset.addressId;
+
+//     // 2. Hide saved addresses
+//     saved_addresses_section.classList.add("hidden");
+
+//     // 3. Hide Add New Address
+//     add_address_card.classList.add("hidden");
+
+//     // 4. Show address form
+//     add_address_form.classList.remove("hidden");
+
+//     // 5. Change heading
+//     addressHeading.innerText = "Edit Address";
+
+//     // 6. Change button
+//     saveButton.innerText = "Save Changes";
+
+//     // 7. Remember which address we're editing
+//     editAddressId = addressId;
+// });
+// })
+
+
+
+
+
+
+
+
 
 
 /* ===== PAYMENT SELECTION ===== */
