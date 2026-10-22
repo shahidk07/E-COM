@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="{% static 'css/checkout.css' %}">
 
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
 <body>
     {% include "navbar.html" %}
@@ -419,11 +420,45 @@ async function placeOrder() {
 
     const result = await response.json();
     console.log("SERVER RESPONSE:", result);
-    if (result.status == 200) {
-        showOrderSuccess();
-        setTimeout(() => { window.location.href = "/orders/"; }, 2000);
-    }
+    if (result.success && result.payment_method === "cod") {
+    showOrderSuccess();
+
+    setTimeout(() => {
+        window.location.href = "/orders/";
+    }, 2000);
+
+} else if (
+    result.success &&
+    result.payment_method === "razorpay"
+) {
+    const options = {
+        key: result.key,
+        amount: result.amount,
+        currency: result.currency,
+        name: "Shahid Store",
+        description: "Order #" + result.store_order_id,
+        order_id: result.razorpay_order_id,
+
+        handler: function (paymentResponse) {
+            console.log("Payment response:", paymentResponse);
+
+            // Next, we'll send this response to Django
+            // for signature verification.
+        },
+
+        theme: {
+            color: "#0891b2"
+        }
+    };
+
+    const razorpay = new Razorpay(options);
+    razorpay.open();
 }
+}
+
+
+
+
 
 function showOrderSuccess() {
     document.getElementById("orderSuccessModal").classList.add("vis");

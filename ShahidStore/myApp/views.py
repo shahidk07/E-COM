@@ -723,7 +723,15 @@ def checkout(request):
 ################################
 
 def place_order(request):
+     # 1. Authenticate the customer
     user_id=request.session["user_id"]
+    if not user_id:
+        return JsonResponse({
+            "success": False,
+            "message": "Please sign in to place an order."
+        }, status=401)
+
+    
     data=request.POST
     payment_method=data.get("payment_method")
     address_id=data.get("address_id")
@@ -786,13 +794,64 @@ def place_order(request):
         item["price"])
         )
         
+    ##############################################
+    # Create Razorpay order only for online payments
+    if payment_method == "razorpay":
+
+        amount_in_paise = int(
+            (total * Decimal("100")).quantize(Decimal("1"))
+        )
+
+        razorpay_order = client.order.create({
+            "amount": amount_in_paise,
+            "currency": "INR",
+            "receipt": str(order_id),
+            "notes": {
+                "store_order_id": str(order_id)
+            }
+        })
+
+        razorpay_order_id = razorpay_order["id"]
+
+        curr.execute("""
+            UPDATE store_order
+            SET razorpay_order_id = %s
+            WHERE order_id = %s
+        """, (razorpay_order_id, order_id))
+
+        conn.commit()
+
+        curr.close()
+        conn.close()
+
+        return JsonResponse({
+            "success": True,
+            "payment_method": "razorpay",
+            "store_order_id": order_id,
+            "razorpay_order_id": razorpay_order_id,
+            "amount": amount_in_paise,
+            "currency": "INR",
+            "key": settings.RAZORPAY_KEY_ID
+        })
+
+
+
+
+        
     # clear store_cart_item and reset store_cart
     clear_cart(curr,cart_id)
     conn.commit()
     
     curr.close()
     conn.close()
-    return JsonResponse({"order_id":order_id,"status":200, "message": "Order placed successfully!"})
+
+    return JsonResponse({
+    "success": True,
+    "payment_method": "cod",
+    "order_id": order_id,
+    "status": 200,
+    "message": "Order placed successfully!"})
+
 
 
 def extract_address(data):
