@@ -4,73 +4,489 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Login - Shahid Store</title>
     <style>
-        *{  margin: 0;padding: 0; box-sizing: border-box;font-family: sans-serif; }
-        body { width: 100vw;height: 100vh;   display: flex;align-items: center; justify-content: center; }
-        #background-video {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            z-index: -1;
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+        :root {
+            --navy: #14213d;
+            --muted: #66758f;
+            --cyan: #08b6d2;
+            --blue: #2163ff;
+            --border: #d9e1ec;
         }
 
-        form { background-color: rgba(0, 0, 0,0.5);
-            height: 550px;
-            width: 500px;
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            min-height: 100svh;
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-direction: column;
-            border-radius: 15px; }
-        h2 {color: aliceblue; text-transform: uppercase;  padding: 10px 0; font-size: 2em;
+            padding: 32px 24px;
+            position: relative;
+            overflow-x: hidden;
+            font-family: 'Inter', sans-serif;
+            color: var(--navy);
+            background:
+                radial-gradient(ellipse at 50% 50%, rgba(255,255,255,.92) 0%, rgba(239,250,255,.86) 42%, rgba(220,242,255,.92) 100%);
         }
-        .form-group { border-bottom: 3px solid white;  width: 330px;margin: 30px 0; }
-        .form-group input {
+
+        /* Soft blue abstract shapes, matching the store's authentication theme */
+        .background-shapes {
+            position: fixed;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .shape-top-left {
+            width: 590px;
+            height: 590px;
+            left: -210px;
+            top: -220px;
+            background: linear-gradient(135deg, rgba(46,158,255,.82), rgba(71,203,245,.30));
+        }
+
+        .shape-top-left::after {
+            content: "";
+            position: absolute;
             width: 100%;
-            height: 40px;
-            background-color: transparent;
-            border: none;
+            height: 100%;
+            inset: 0;
+            border-radius: 50%;
+            background: rgba(225,247,255,.36);
+            transform: translate(65px, 70px);
+        }
+
+        .shape-right {
+            width: 650px;
+            height: 650px;
+            right: -205px;
+            top: 70px;
+            background: linear-gradient(145deg, rgba(74,197,244,.20), rgba(40,142,255,.78));
+        }
+
+        .shape-right::after {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: rgba(255,255,255,.12);
+            transform: translate(-95px, -45px);
+        }
+
+        .shape-bottom-left {
+            width: 570px;
+            height: 570px;
+            left: -205px;
+            bottom: -285px;
+            background: linear-gradient(145deg, rgba(79,203,245,.32), rgba(42,143,255,.85));
+        }
+
+        .shape-bottom-right {
+            width: 520px;
+            height: 520px;
+            right: -130px;
+            bottom: -360px;
+            background: linear-gradient(145deg, rgba(77,195,245,.22), rgba(36,124,255,.70));
+        }
+
+        .card {
+            position: relative;
+            z-index: 1;
+            width: min(100%, 580px);
+            padding: 38px 48px 34px;
+            border: 1px solid rgba(255,255,255,.92);
+            border-radius: 21px;
+            background: rgba(255,255,255,.94);
+            box-shadow: 0 18px 50px rgba(49, 137, 201, .14);
+        }
+
+        .brand {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 28px;
+        }
+
+        /* Replace the path below with your actual logo file if needed. */
+        .brand img {
+            display: block;
+            width: 196px;
+            max-width: 100%;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .brand-fallback {
+            display: none;
+            font-size: 1.65rem;
+            font-weight: 800;
+            font-style: italic;
+            letter-spacing: -.04em;
+            color: #111827;
+            text-align: center;
+        }
+
+        .title {
+            color: var(--navy);
+            text-align: center;
+            font-size: clamp(1.8rem, 3vw, 2.15rem);
+            line-height: 1.2;
+            font-weight: 800;
+            letter-spacing: -.045em;
+            margin-bottom: 12px;
+        }
+
+        .title span {
+            color: #168fe5;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            text-align: center;
+            font-size: 1rem;
+            line-height: 1.55;
+            margin: 0 auto 28px;
+            max-width: 390px;
+        }
+
+        .error-msg {
+            margin-bottom: 18px;
+            padding: 11px 14px;
+            color: #b42318;
+            background: #fff1f0;
+            border: 1px solid #ffd1cc;
+            border-radius: 9px;
+            font-size: .88rem;
+            line-height: 1.45;
+            text-align: center;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 23px;
+        }
+
+        .field-label {
+            display: block;
+            margin-bottom: 9px;
+            color: var(--navy);
+            font-size: .94rem;
+            font-weight: 700;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 18px;
+            top: 43px;
+            width: 20px;
+            height: 20px;
+            color: #52627c;
+            pointer-events: none;
+        }
+
+        .input-group input {
+            display: block;
+            width: 100%;
+            height: 57px;
+            padding: 0 52px 0 58px;
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
             outline: none;
-            color: #fff; }
-        p { margin-top: 10px;
-            color: white; text-align: center;
-            padding: 10px; }
-        .form-group input::placeholder {
-    color: white;
-    opacity: 3s;}
-        button{border: none;
-            transition:background-color 1s ease ;
-        height:45px;
-    width:70%;
-font-size:1.5em;
-text-transform: uppercase;
-border-radius: 20px;
-}
-button:active {background-color:dodgerblue;
-}
+            background: rgba(255,255,255,.78);
+            color: var(--navy);
+            font: inherit;
+            font-size: .95rem;
+            transition: border-color .2s, box-shadow .2s, background .2s;
+        }
+
+        .input-group input::placeholder {
+            color: #718099;
+            opacity: 1;
+        }
+
+        .input-group input:focus {
+            border-color: #2397ff;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(35,151,255,.12);
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 16px;
+            top: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3px;
+            border: 0;
+            background: transparent;
+            color: #52627c;
+            cursor: pointer;
+        }
+
+        .toggle-password svg {
+            width: 21px;
+            height: 21px;
+        }
+
+        .forgot-row {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: -10px;
+            margin-bottom: 22px;
+        }
+
+        .forgot {
+            color: #078fdf;
+            font-size: .93rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: color .2s;
+        }
+
+        .forgot:hover,
+        .bottom-text a:hover {
+            color: #164bdb;
+        }
+
+        .btn-submit {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            width: 100%;
+            min-height: 58px;
+            padding: 14px 20px;
+            border: 0;
+            border-radius: 13px;
+            background: linear-gradient(100deg, var(--cyan) 0%, #078fe9 52%, var(--blue) 100%);
+            color: #fff;
+            font-family: inherit;
+            font-size: 1.02rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 7px 16px rgba(28, 133, 237, .12);
+            transition: transform .18s, box-shadow .18s, filter .18s;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 22px rgba(28, 133, 237, .2);
+            filter: saturate(1.05);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        .btn-submit svg {
+            width: 21px;
+            height: 21px;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin: 27px 0 22px;
+            color: #718099;
+            font-size: .82rem;
+            font-weight: 600;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #dbe3ed;
+        }
+
+        .bottom-text {
+            color: #687791;
+            text-align: center;
+            font-size: .93rem;
+            line-height: 1.5;
+        }
+
+        .bottom-text a {
+            margin-left: 7px;
+            color: #124fe8;
+            font-weight: 700;
+            text-decoration: none;
+            transition: color .2s;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 22px 15px;
+                overflow-y: auto;
+            }
+
+            .card {
+                padding: 30px 23px 27px;
+                border-radius: 18px;
+            }
+
+            .brand {
+                margin-bottom: 24px;
+            }
+
+            .brand img {
+                width: 175px;
+            }
+
+            .subtitle {
+                margin-bottom: 25px;
+                font-size: .94rem;
+            }
+
+            .input-group {
+                margin-bottom: 20px;
+            }
+
+            .input-group input {
+                height: 54px;
+                padding-left: 52px;
+            }
+
+            .input-icon {
+                left: 16px;
+                top: 41px;
+            }
+
+            .toggle-password {
+                top: 40px;
+                right: 13px;
+            }
+
+            .shape-top-left {
+                width: 390px;
+                height: 390px;
+                left: -230px;
+                top: -170px;
+            }
+
+            .shape-right {
+                width: 390px;
+                height: 390px;
+                right: -260px;
+                top: 30%;
+            }
+
+            .shape-bottom-left {
+                width: 330px;
+                height: 330px;
+                left: -200px;
+                bottom: -190px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                transition-duration: .01ms !important;
+            }
+        }
     </style>
 </head>
-<body  style="background: none;">
-    <video autoplay muted loop id="background-video">
-        <source src="{% static 'videos/login.mp4' %}" type="video/mp4">
-        Your browser does not support the video tag.
-    </video>
-    <form action="/signin/" method="post">
-        {% csrf_token %}
-        <h2>LOGIN</h2>
-        <div class="form-group">
-            <input type="text" placeholder="Email" name="email" required>
+<body>
+    <div class="background-shapes" aria-hidden="true">
+        <div class="shape shape-top-left"></div>
+        <div class="shape shape-right"></div>
+        <div class="shape shape-bottom-left"></div>
+        <div class="shape shape-bottom-right"></div>
+    </div>
+
+    <main class="card">
+        <div class="brand">
+            <img src="{% static 'images/brandlogo.png' %}" alt="SHAHID — Witness The Growth"
+                 onerror="this.style.display='none';">
         </div>
-        <div class="form-group">
-            <input type="password" placeholder="Password" name="password" required>
-        </div>
-        <p><input type="checkbox"> Remember me <a href="#">Forgot Password?</a></p>
-        <button type="submit">Login</button>
-        <p>Don't have an account? <a href="/signup/">Register</a></p>
-    </form>
+
+        <h1 class="title">Welcome <span>Back</span></h1>
+        <p class="subtitle">Login to your account and continue shopping with us.</p>
+
+        {% if message %}
+            <div class="error-msg" role="alert">{{ message }}</div>
+        {% endif %}
+
+        <form action="/signin/" method="POST">
+            {% csrf_token %}
+
+            <div class="input-group">
+                <label class="field-label" for="loginEmail">Email Address</label>
+                <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <rect width="20" height="16" x="2" y="4" rx="2"/>
+                    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+                </svg>
+                <input id="loginEmail" type="email" name="email" placeholder="Enter your email"
+                       required autocomplete="email">
+            </div>
+
+            <div class="input-group">
+                <label class="field-label" for="loginPassword">Password</label>
+                <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+                <input type="password" id="loginPassword" name="password"
+                       placeholder="Enter your password" required autocomplete="current-password">
+                <button type="button" class="toggle-password" aria-label="Show password"
+                        onclick="togglePass('loginPassword', this)">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="forgot-row">
+                <a href="#" class="forgot">Forgot Password?</a>
+            </div>
+
+            <button type="submit" class="btn-submit">
+                Login
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+            </button>
+        </form>
+
+        <div class="divider">OR</div>
+        <p class="bottom-text">Don't have an account? <a href="/signup/">Sign Up</a></p>
+    </main>
+
+    <script>
+        function togglePass(id, button) {
+            const input = document.getElementById(id);
+            const showPassword = input.type === 'password';
+            input.type = showPassword ? 'text' : 'password';
+            button.setAttribute('aria-label', showPassword ? 'Hide password' : 'Show password');
+
+            button.innerHTML = showPassword
+                ? `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 10.6a2 2 0 0 0 2.8 2.8"/><path d="M9.9 5.2A10.8 10.8 0 0 1 12 5c6.4 0 10 7 10 7a16 16 0 0 1-3.1 4.1"/><path d="M6.2 6.2C3.5 8 2 12 2 12s3.6 7 10 7a10 10 0 0 0 4-.8"/></svg>`
+                : `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>`;
+        }
+    </script>
 </body>
 </html>

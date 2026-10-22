@@ -1,34 +1,6 @@
-from django.shortcuts import render
+﻿from django.shortcuts import render
 from django.urls import path,include
 from . import views
-
-print("""
-========================================
-🚀 ShahidStore Routes
-========================================
-
-🏠 Home
-http://127.0.0.1:8000/
-
-🛍️ Catalog
-http://127.0.0.1:8000/catalog/
-
-🛒 Cart
-http://127.0.0.1:8000/cart/
-
-Checkout
-http://127.0.0.1:8000/checkout/
-
-ORDERS
-http://127.0.0.1:8000/orders/
-
-📦 signup
-http://127.0.0.1:8000/signup/
-
-📦 signin
-http://127.0.0.1:8000/signin/
-========================================
-""")
 
 urlpatterns = [
     path('', views.home, name='home'),
@@ -46,8 +18,10 @@ urlpatterns = [
     path('remove_coupon/',views.remove_coupon,name="remove_coupon"),
     path("checkout/", views.checkout, name="checkout"),
     path("aboutus/", views.aboutus, name="aboutus"),
+    path("update_address/", views.update_address, name="update_address"),
     path("delete_address/", views.delete_address, name="delete_address"),
     path("place_order/", views.place_order, name="place_order"),
     path("orders/", views.orders, name="orders"),
+    path("profile/", views.profile, name="profile"),
     path("contact-us/", views.contact_us, name="contact_us"),
 ]

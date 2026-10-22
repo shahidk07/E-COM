@@ -324,11 +324,9 @@ def get_cart_summary(curr,user_id):
 def cart(request):
     from psycopg2.extras import RealDictCursor
 
-    user_id=request.session["user_id"]
+    user_id=request.session.get("user_id")
     if not user_id:
-            return JsonResponse(
-                {"success": False, "message": "Please login first"},
-                status=401)
+            return redirect("/signin/")
             
     conn=connect()
     curr=conn.cursor(cursor_factory=RealDictCursor)
@@ -875,6 +873,47 @@ def delete_address(request):
         return JsonResponse({"status":500,"message":"Address cannot be deleted for some reason"})
 
 
+def update_address(request):
+    if request.method == "POST":
+        address_id = request.POST.get("address_id")
+        full_name = request.POST.get("full_name")
+        phone = request.POST.get("phone_number")
+        address_line1 = request.POST.get("address_line1")
+        address_line2 = request.POST.get("address_line2")
+        city = request.POST.get("city")
+        state = request.POST.get("state")
+        pincode = request.POST.get("pincode")
+
+        user_id = request.session.get("user_id")
+
+        conn = connect()
+        curr = conn.cursor()
+
+        curr.execute("""
+            UPDATE store_address
+            SET full_name = %s,
+                phone_number = %s,
+                address_line1 = %s,
+                address_line2 = %s,
+                city = %s,
+                state = %s,
+                pincode = %s
+            WHERE address_id = %s AND user_id = %s
+        """, (
+            full_name, phone, address_line1, address_line2,
+            city, state, pincode, address_id, user_id
+        ))
+
+        conn.commit()
+        curr.close()
+        conn.close()
+
+        return JsonResponse({"success": True, "message": "Address updated successfully!"})
+
+    return JsonResponse({"success": False}, status=405)
+
+
+
 ###########################
 ########cart_reset#########
 ###########################
@@ -944,6 +983,80 @@ def aboutus(request):
 
 def contact_us(request):
     return render(request, "contact_us.html")
+
+def profile(request):
+    user_id = request.session.get("user_id")
+    if not user_id:
+        return redirect("/signin/")
+
+    from psycopg2.extras import RealDictCursor
+    conn = connect()
+    curr = conn.cursor(cursor_factory=RealDictCursor)
+
+    message = None
+    message_type = None
+
+    if request.method == "POST":
+        action = request.POST.get("action")
+        if action == "update_name":
+            first_name = request.POST.get("first_name", "").strip()
+            last_name = request.POST.get("last_name", "").strip()
+
+            if first_name:
+                curr.execute("""
+                    UPDATE storeusers
+                    SET first_name = %s, last_name = %s
+                    WHERE user_id = %s
+                """, (first_name, last_name, user_id))
+                conn.commit()
+                request.session["first_name"] = first_name
+                request.session["last_name"] = last_name
+                message = "Profile name updated successfully!"
+                message_type = "success"
+
+                is_ajax = request.headers.get("x-requested-with") == "XMLHttpRequest" or "application/json" in request.headers.get("accept", "")
+                if is_ajax:
+                    curr.close()
+                    conn.close()
+                    return JsonResponse({
+                        "success": True,
+                        "message": message,
+                        "first_name": first_name,
+                        "last_name": last_name,
+                        "full_name": f"{first_name} {last_name}".strip()
+                    })
+            else:
+                message = "First name cannot be empty."
+                message_type = "error"
+                is_ajax = request.headers.get("x-requested-with") == "XMLHttpRequest" or "application/json" in request.headers.get("accept", "")
+                if is_ajax:
+                    curr.close()
+                    conn.close()
+                    return JsonResponse({"success": False, "message": message}, status=400)
+
+    # Fetch user details
+    curr.execute("SELECT user_id, first_name, last_name, email FROM storeusers WHERE user_id = %s", (user_id,))
+    user_info = curr.fetchone()
+
+    # Fetch all saved addresses
+    curr.execute("""
+        SELECT address_id, full_name, phone_number, address_line1, address_line2, city, state, pincode, created_at
+        FROM store_address
+        WHERE user_id = %s
+        ORDER BY created_at DESC
+    """, (user_id,))
+    addresses = curr.fetchall()
+
+    curr.close()
+    conn.close()
+
+    return render(request, "profile.html", {
+        "user_info": user_info,
+        "addresses": addresses,
+        "message": message,
+        "message_type": message_type
+    })
+
 
 
 

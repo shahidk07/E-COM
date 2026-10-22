@@ -17,49 +17,7 @@
 </head>
 <body class="bg-slate-50">
 
-<!-- Navbar -->
-<nav class="bg-white shadow-sm border-b">
-    <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-
-        <!-- Logo -->
-        <a href="/" class="flex items-center">
-            <img
-                src="../static/images/brand_logo.png"
-                alt="Shahid Enterprises"
-                class="h-12 w-auto">
-        </a>
-
-        <!-- Navigation -->
-        <div class="hidden md:flex items-center gap-8">
-            <a href="/" class="hover:text-cyan-600">Home</a>
-            <a href="/catalog/" class="hover:text-cyan-600">Products</a>
-            <a href="/catalog/" class="hover:text-cyan-600">Categories</a>
-            <a href="/contact-us/" class="hover:text-cyan-600">Contact</a>
-        </div>
-
-        <!-- Actions -->
-        <div class="flex items-center gap-4">
-            <a href="/cart/"><button class="hover:text-cyan-600">
-                Cart
-            </button></a>
-
-            {% if request.session.is_authenticated %}
-            <a href="/logout/">
-                <button class="px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition">
-                    Logout
-                </button>
-            </a>
-            {% else %}
-            <a href="/signin/">
-                <button class="px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition">
-                    Login
-                </button>
-            </a>
-            {% endif %}
-        </div>
-
-    </div>
-</nav>
+{% include 'navbar.html' %}
 
 <!-- Hero -->
 <section class="bg-gradient-to-r from-cyan-500 to-blue-600 text-white">
